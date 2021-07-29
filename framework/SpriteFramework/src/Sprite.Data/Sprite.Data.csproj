@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Common"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+    </ItemGroup>
+
+</Project>
