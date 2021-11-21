@@ -9,14 +9,18 @@ namespace Sprite.Data.Persistence
     /// </summary>
     public interface ISupportTransaction
     {
-        void UseTransaction(DbTransaction transaction);
+        DbTransaction? CurrentTransaction { get; }
 
+        DbTransaction  BeginTransaction();
+        
+        void UseTransaction(DbTransaction transaction);
+        
         void Commit();
 
         Task CommitAsync(CancellationToken cancellationToken);
 
         void Rollback();
 
-        Task RollBackAsync(CancellationToken cancellationToken);
+        Task RollbackAsync(CancellationToken cancellationToken);
     }
 }

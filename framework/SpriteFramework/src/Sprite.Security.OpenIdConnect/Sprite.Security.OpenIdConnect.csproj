@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenIddict.Core" Version="3.1.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Data\Sprite.Data.csproj"/>
+        <ProjectReference Include="..\Sprite.Security.Abstractions\Sprite.Security.Abstractions.csproj"/>
+    </ItemGroup>
+
+</Project>

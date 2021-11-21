@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Data.EntityFrameworkCore\Sprite.Data.EntityFrameworkCore.csproj"/>
+        <ProjectReference Include="..\Sprite.Security.OpenIdConnect\Sprite.Security.OpenIdConnect.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="OpenIdConnect"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.1.1"/>
+    </ItemGroup>
+
+</Project>

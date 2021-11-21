@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>Sprite.Web</RootNamespace>
+        <IsPackable>true</IsPackable>
+        <Authors>Sprite</Authors>
+        <Version>0.0.1</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+    </ItemGroup>
+
+</Project>

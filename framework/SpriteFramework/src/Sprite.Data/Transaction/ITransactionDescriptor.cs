@@ -5,7 +5,7 @@ namespace Sprite.Data.Transaction
 {
     public interface ITransactionDescriptor
     {
-        TransactionPropagation Propagation { get; }
+        Propagation Propagation { get; }
 
         /// <summary>
         /// 事务隔离级别

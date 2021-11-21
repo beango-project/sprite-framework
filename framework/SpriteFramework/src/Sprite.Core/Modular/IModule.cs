@@ -4,8 +4,6 @@ namespace Sprite.Modular
 {
     public interface IModule
     {
-        void ConfigureServices(IServiceCollection service);
-
-        void Configure(OnApplicationInitContext context);
+        void ConfigureServices(IServiceCollection services);
     }
 }

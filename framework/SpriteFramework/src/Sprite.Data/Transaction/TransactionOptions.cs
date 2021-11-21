@@ -5,7 +5,7 @@ namespace Sprite.Data.Transaction
 {
     public class TransactionOptions
     {
-        public TransactionPropagation Propagation { get; set; } = TransactionPropagation.Required;
+        public Propagation Propagation { get; set; } = Propagation.Auto;
 
         /// <summary>
         /// 事务隔离级别

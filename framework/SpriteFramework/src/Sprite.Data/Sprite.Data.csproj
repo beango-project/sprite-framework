@@ -1,15 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
+        <IsPackable>true</IsPackable>
+        <Authors>Sprite</Authors>
+        <Version>0.0.1</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Common"/>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+        <ProjectReference Include="..\Sprite.Data.Common\Sprite.Data.Common.csproj"/>
+        <ProjectReference Include="..\Sprite.UidGenerator\Sprite.UidGenerator.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+        <Compile Remove="Uow\UnitOfWorkSynchronizer.cs"/>
     </ItemGroup>
 
 </Project>

@@ -1,118 +1,158 @@
 ﻿using System;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
-using Sprite.Data.Persistence;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using Sprite.Data.Transaction;
 using Sprite.DependencyInjection;
 
 namespace Sprite.Data.Uow
 {
-    public class UnitOfWorkManager : ISingletonInjection
+    public class UnitOfWorkManager : IUnitOfWorkManager, ISingletonInjection
     {
-        private readonly IAmbientUnitOfWork _ambientUnitOfWork;
-
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        // public IUnitOfWork Current => _scopedUnitOfWorks?.LastOrDefault();
 
 
-        private AsyncLocal<IVendor> _vendorCell = new AsyncLocal<IVendor>();
+        public IUnitOfWork? CurrentUow => AmbientUnitOfWork.Current.UnitOfWork;
 
-        public UnitOfWorkManager(IServiceScopeFactory serviceScopeFactory, IAmbientUnitOfWork ambientUnitOfWork)
+
+        // private readonly List<IUnitOfWork> _scopedUnitOfWorks;
+        //
+        // private readonly List<IUnitOfWork> _actualUnitOfWorks;
+
+        public UnitOfWorkManager()
         {
-            _serviceScopeFactory = serviceScopeFactory;
-            _ambientUnitOfWork = ambientUnitOfWork;
+            // _scopedUnitOfWorks = new List<IUnitOfWork>();
+            // _actualUnitOfWorks = new List<IUnitOfWork>();
         }
 
-        public IUnitOfWork CurrentUow => GetCurrentUnitOfWork();
-
-        public IVendor CurrentVendor => GetCurrentVendor();
-
-        public IUnitOfWork Begin(TransactionOptions options)
+        public IUnitOfWork Begin(TransactionOptions options = null)
         {
+            if (options == null)
+            {
+                options = new TransactionOptions();
+            }
+
             switch (options.Propagation)
             {
-                case TransactionPropagation.Required:
+                case Propagation.Required:
+                    return FindOrBeginVirtualUnitOfWork(options, true) ?? BeginNewUnitOfWork(options);
+                case Propagation.Auto:
+                case Propagation.Supports:
                     if (CurrentUow != null)
                     {
-                        var virtualUnitOfWork = CreateVirtualUnitOfWork();
-                        _ambientUnitOfWork.SetUnitOfWork(virtualUnitOfWork);
-                        return virtualUnitOfWork;
+                        return FindOrBeginVirtualUnitOfWork(options, CurrentUow.IsSupportTransaction) ?? BeginNewUnitOfWork(options);
                     }
-
-                    var newUnitOfWork = new UnitOfWork(CurrentVendor, null);
-                    _ambientUnitOfWork.SetUnitOfWork(newUnitOfWork);
-                    return newUnitOfWork;
-
-                case TransactionPropagation.RequiresNew:
-                    if (CurrentUow != null)
+                    else
                     {
-                        //挂起当前工作单元
+                        return BeginNewUnitOfWork(options);
                     }
-
-                    var serviceScope = _serviceScopeFactory.CreateScope();
-                    try
-                    {
-                        var vendorType = CurrentVendor.GetType();
-                        var implVendorType = vendorType.GenericTypeArguments[0];
-                        var adapterType = typeof(PersistenceVendorAdapter<>).MakeGenericType(implVendorType);
-                        var isAssignable = vendorType.IsAssignableTo(adapterType);
-                        //这里用反射获取真正的DbContext
-                        var vendor = serviceScope.ServiceProvider.GetRequiredService(implVendorType);
-
-                        var instance = Activator.CreateInstance(vendorType, vendor);
-
-                        var unitOfWork = new UnitOfWork((IVendor) instance, null);
-
-                        //工作单元销毁时 持久化提供商也销毁
-                        unitOfWork.Disposed += (_, _) => { serviceScope.Dispose(); };
-
-                        _ambientUnitOfWork.SetUnitOfWork(unitOfWork);
-                        return unitOfWork;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
-                    }
-
-
-                    break;
+                case Propagation.RequiresNew:
+                    return BeginNewUnitOfWork(options);
+                case Propagation.Mandatory:
+                    return FindOrBeginVirtualUnitOfWork(options, true) ?? throw new InvalidOperationException("must  tx");
+                case Propagation.Nested:
+                    return FindOrBeginVirtualUnitOfWork(options, true) ?? throw new InvalidOperationException("There is currently no working unit of work and cannot be nested");
+                case Propagation.NotSupported:
+                    return FindOrBeginVirtualUnitOfWork(options, false) ?? BeginNewUnitOfWork(options);
+                case Propagation.Never:
+                    return FindOrCreateNonTransactionalUnitOfWork(options);
+                default: throw new NotImplementedException();
             }
+        }
+
+        private IUnitOfWork FindOrBeginVirtualUnitOfWork(TransactionOptions options, bool isTransactional)
+        {
+            if (CurrentUow == null)
+            {
+                return null;
+            }
+
+            if (CurrentUow.Options.Propagation == Propagation.Never)
+            {
+                if (options.Propagation is Propagation.Required or Propagation.RequiresNew or Propagation.Mandatory or
+                    Propagation.Nested)
+                {
+                    throw new Exception("由于事务传播配置为Never,无法开启事务");
+                }
+            }
+
+            if (CurrentUow.IsSupportTransaction != isTransactional)
+            {
+                return null;
+            }
+
+            if (CurrentUow is VirtualUnitOfWork virtualUow)
+            {
+                if (virtualUow is { IsDisposed: false, IsCompleted: false })
+                {
+                    var outer = CurrentUow;
+                    var newUow = new VirtualUnitOfWork(options, virtualUow.BaseUow);
+                    // newUow.Outer = outer;
+                    AmbientUnitOfWork.Current.AddUnitOfWork(newUow);
+                    newUow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.AddUnitOfWork(outer); };
+                    return newUow;
+                }
+            }
+            else
+            {
+                var outer = CurrentUow;
+                var newUow = new VirtualUnitOfWork(options, outer);
+                // newUow.Outer = outer;
+                newUow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.AddUnitOfWork(outer); };
+                AmbientUnitOfWork.Current.AddUnitOfWork(newUow);
+                return newUow;
+            }
+            //
+            // if (Current is VirtualUnitOfWork virtualUow)
+            // {
+            //     var uow = _actualUnitOfWorks.LastOrDefault(u => u.Id == virtualUow.BaseUow.Id);
+            //     if (uow is { IsDisposed: false, IsCompleted: false })
+            //     {
+            //         var newUow = new VirtualUnitOfWork(uow);
+            //         _scopedUnitOfWorks.Add(newUow);
+            //         newUow.OnDisposed += (_, _) => { _scopedUnitOfWorks.Remove(newUow); };
+            //         return newUow;
+            //     }
+            // }
+            // else
+            // {
+            //     var newUow = new VirtualUnitOfWork(Current);
+            //     _scopedUnitOfWorks.Add(newUow);
+            //     newUow.OnDisposed += (_, _) => { _scopedUnitOfWorks.Remove(newUow); };
+            //     return newUow;
+            // }
 
             return null;
         }
 
-        public IUnitOfWork CreateVirtualUnitOfWork()
-        {
-            return new VirtualUnitOfWork(CurrentUow);
-        }
 
-        private IVendor GetCurrentVendor()
+        private IUnitOfWork BeginNewUnitOfWork(TransactionOptions options)
         {
-            // while (!_vendorCell.Value.IsDispose)
+            var outer = CurrentUow;
+            var uow = new UnitOfWork(options);
+            uow.Outer = outer;
+            uow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.AddUnitOfWork(outer); };
+            AmbientUnitOfWork.Current.AddUnitOfWork(uow);
+            // uow.OnDisposed += (_, _) =>
             // {
-            //     return _vendorCell.Value;
-            // }
-            return _vendorCell.Value;
-            // return null;
-        }
+            //     _actualUnitOfWorks.Remove(uow);
+            //     _scopedUnitOfWorks.Remove(uow);
+            // };
+            // _scopedUnitOfWorks.Add(uow);
+            // _actualUnitOfWorks.Add(uow);
 
-        public void SetVendor(IVendor vendor)
-        {
-            _vendorCell.Value = vendor;
-        }
-
-        private IUnitOfWork GetCurrentUnitOfWork()
-        {
-            var uow = _ambientUnitOfWork.UnitOfWork;
-
-            //Skip reserved unit of work
-            // while (uow != null && (uow.IsDisposed || uow.IsCompleted))
-            // {
-            //     return uow;
-            // }
-            //
-            // return null;
             return uow;
+        }
+
+        private IUnitOfWork FindOrCreateNonTransactionalUnitOfWork(TransactionOptions options)
+        {
+            var outer = CurrentUow;
+            // if (outer != null && outer.IsSupportTransaction)
+            // {
+            //     throw new Exception("Propagation_Never: 以非事务方式执行操作，如果当前事务存在则抛出异常");
+            // }
+
+            return BeginNewUnitOfWork(options);
         }
     }
 }

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <IsPackable>true</IsPackable>
+        <Authors>Sprite</Authors>
+        <Version>0.0.1</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>10</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Security.Abstractions\Sprite.Security.Abstractions.csproj"/>
+        <ProjectReference Include="..\Sprite.Web.Common\Sprite.Web.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

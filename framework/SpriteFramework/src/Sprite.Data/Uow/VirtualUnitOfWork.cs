@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Sprite.Data.Persistence;
@@ -8,60 +11,93 @@ namespace Sprite.Data.Uow
 {
     public class VirtualUnitOfWork : IUnitOfWork
     {
-        private readonly IUnitOfWork _baseUow;
-
-        public VirtualUnitOfWork(IUnitOfWork baseUow)
-        {
-            _baseUow = baseUow;
-        }
-
-        public bool IsDisposed { get; }
-        public bool IsCompleted { get; }
-        public Guid Id { get; }
-        public IVendor Vendor => _baseUow.Vendor;
-        public TransactionOptions Options { get; }
-        public event EventHandler Disposed;
-
         public void Dispose()
         {
-            throw new NotImplementedException();
+            OnDisposed?.Invoke(this, null);
         }
 
+        public Guid Id => BaseUow.Id;
+        public bool IsDisposed => BaseUow.IsDisposed;
+        public bool IsCompleted => BaseUow.IsCompleted;
+
+        public bool IsSupportTransaction => BaseUow.IsSupportTransaction;
+
+        public IUnitOfWork Outer
+        {
+            get => BaseUow.Outer;
+            set => BaseUow.Outer = value;
+        }
+
+        public TransactionOptions Options { get; }
+
+        public IUnitOfWork BaseUow { get; }
+
+        public VirtualUnitOfWork(TransactionOptions options, IUnitOfWork baseUow)
+        {
+            Options = options;
+            BaseUow = baseUow;
+            BaseUow.OnFailed += (sender, args) => { OnFailed?.Invoke(sender, args); };
+            BaseUow.OnCompleted += (sender, args) => { OnCompleted?.Invoke(sender, args); };
+            // BaseUow.OnDisposed += (sender, args) => { OnDisposed?.Invoke(sender, args); };
+        }
+
+        public IVendor GetOrAddVendor(string key, IVendor vendor)
+        {
+            return BaseUow.GetOrAddVendor(key, vendor);
+        }
+
+        public IVendor FindVendor(string key)
+        {
+            return BaseUow.FindVendor(key);
+        }
+
+        public DbTransaction FindDbTransaction(string key)
+        {
+            return BaseUow.FindDbTransaction(key);
+        }
+
+        public void AddDbTransaction(string key, DbTransaction dbTransaction)
+        {
+            BaseUow.AddDbTransaction(key, dbTransaction);
+        }
+
+        public IReadOnlyList<IVendor> GetVendors()
+        {
+            return BaseUow.GetVendors();
+        }
 
         public int SaveChanges()
         {
-            return _baseUow.SaveChanges();
+            return BaseUow.SaveChanges();
         }
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return _baseUow.SaveChangesAsync(cancellationToken);
+            return BaseUow.SaveChangesAsync(cancellationToken);
         }
 
-        public void Commit()
-        {
-            //do nothing
-        }
-
-        public Task CommitAsync(CancellationToken cancellationToken)
-        {
-            //do nothing
-            return Task.CompletedTask;
-        }
 
         public void Rollback()
         {
-            _baseUow.Rollback();
+            BaseUow.Rollback();
         }
 
-        public Task RollBackAsync(CancellationToken cancellationToken)
+        public Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            return _baseUow.RollBackAsync(cancellationToken);
+            return BaseUow.RollbackAsync(cancellationToken);
         }
 
-        public ValueTask DisposeAsync()
+        public void Completed()
         {
-            throw new NotImplementedException();
         }
+
+        public Task CompletedAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public event EventHandler OnCompleted;
+        public event EventHandler OnFailed;
+        public event EventHandler OnDisposed;
     }
 }

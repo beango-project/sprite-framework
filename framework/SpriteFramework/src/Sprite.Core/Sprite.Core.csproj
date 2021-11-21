@@ -1,22 +1,33 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>Sprite</RootNamespace>
+        <Nullable>disable</Nullable>
+        <IsPackable>true</IsPackable>
+        <Authors>Sprite</Authors>
+        <Version>0.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2020.3.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0"/>
-        <PackageReference Include="Nito.AsyncEx" Version="5.1.0"/>
+        <PackageReference Include="AspectInjector" Version="2.6.0"/>
+        <PackageReference Include="FastExpressionCompiler" Version="3.2.1"/>
+        <PackageReference Include="FastExpressionCompiler.LightExpression" Version="3.2.1"/>
+        <PackageReference Include="ImTools.dll" Version="3.1.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0"/>
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2"/>
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0"/>
+        <PackageReference Include="System.Linq.Async" Version="5.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Aspects"/>
-        <Folder Include="Common"/>
         <Folder Include="Logging"/>
+        <Folder Include="System\Object"/>
     </ItemGroup>
 
 </Project>

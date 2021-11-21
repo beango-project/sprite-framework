@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Data.EntityFrameworkCore\Sprite.Data.EntityFrameworkCore.csproj"/>
+        <ProjectReference Include="..\Sprite.Security\Sprite.Security.csproj"/>
+    </ItemGroup>
+
+</Project>

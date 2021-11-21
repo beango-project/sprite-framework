@@ -4,12 +4,6 @@ namespace Sprite.Data.Exceptions
 {
     public class EntityNotFoundException : Exception
     {
-        public EntityNotFoundException(Type entityType, object id)
-        {
-            EntityType = entityType;
-            Id = id;
-        }
-
         /// <summary>
         /// Type of the entity.
         /// </summary>
@@ -19,5 +13,12 @@ namespace Sprite.Data.Exceptions
         /// Id of the Entity.
         /// </summary>
         public object Id { get; set; }
+
+
+        public EntityNotFoundException(Type entityType, object id)
+        {
+            EntityType = entityType;
+            Id = id;
+        }
     }
 }

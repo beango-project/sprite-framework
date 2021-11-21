@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Sprite.Data.Persistence;
 
 namespace Sprite.Data.Transaction
@@ -9,14 +8,12 @@ namespace Sprite.Data.Transaction
         private IPersistenceVenderProvider _persistenceVender;
 
         private AmbientTransaction _AmbientTransaction { get; }
-
-        [CanBeNull]
-        public ITransactionInfo? CurrentTransaction => GetCurrentTransactionInfo();
+        public ITransactionInfo CurrentTransaction => CurrentTransaction;
 
 
         public ITransactionInfo BeginTransaction(ITransactionDescriptor descriptor)
         {
-            if (descriptor.Propagation == TransactionPropagation.RequiresNew && CurrentTransaction != null)
+            if (descriptor.Propagation == Propagation.RequiresNew && CurrentTransaction != null)
             {
                 var persistenceVender = _persistenceVender.GetPersistenceVender();
                 return CreateNewTransaction(descriptor);

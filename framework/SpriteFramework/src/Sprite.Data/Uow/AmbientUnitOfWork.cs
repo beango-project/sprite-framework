@@ -1,24 +1,93 @@
-﻿using System.Threading;
-using Sprite.DependencyInjection;
-using Sprite.DependencyInjection.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using JetBrains.Annotations;
 
 namespace Sprite.Data.Uow
 {
-    [Export(typeof(IAmbientUnitOfWork), typeof(IUnitOfWorkAccessor))]
-    public class AmbientUnitOfWork : IAmbientUnitOfWork, ISingletonInjection
+    public class AmbientUnitOfWork
     {
-        private readonly AsyncLocal<IUnitOfWork> _currentUow;
+        private static volatile AmbientUnitOfWork _current;
 
-        public AmbientUnitOfWork()
+        private static AsyncLocal<IUnitOfWork> _unitOfWorkCell = new AsyncLocal<IUnitOfWork>(ValueChanged);
+
+
+        public static AmbientUnitOfWork Current => _current;
+
+        public IUnitOfWork? UnitOfWork
         {
-            _currentUow = new AsyncLocal<IUnitOfWork>();
+            get
+            {
+                var current = _unitOfWorkCell.Value;
+                while (current?.IsDisposed == true) //if current uow is disposed we change current uow to outer(previous) 
+                {
+                    _unitOfWorkCell.Value = current = current.Outer;
+                }
+
+                return current;
+            }
         }
 
-        public IUnitOfWork UnitOfWork => _currentUow.Value;
-
-        public void SetUnitOfWork(IUnitOfWork unitOfWork)
+        private static void ValueChanged(AsyncLocalValueChangedArgs<IUnitOfWork> args)
         {
-            _currentUow.Value = unitOfWork;
+            if (args.ThreadContextChanged)
+            {
+                // if (!ExecutionContext.IsFlowSuppressed())
+                // {
+                //     ExecutionContext.SuppressFlow();
+                // }
+
+                var previous = args.PreviousValue;
+                var current = args.CurrentValue;
+
+
+                if (current == null || previous?.IsDisposed == false)
+                {
+                    _unitOfWorkCell.Value = previous;
+                }
+
+                // if ((current?.IsDisposed == true && ExecutionContext.IsFlowSuppressed()))
+                // {
+                //     ExecutionContext.RestoreFlow();
+                // }
+            }
+        }
+
+        public void AddUnitOfWork(IUnitOfWork unitOfWork)
+        {
+            _unitOfWorkCell.Value = unitOfWork;
+            // if (_unitOfWorkCell.Value == null)
+            // {
+            //     _unitOfWorkCell.Value = new ScopedUnitOfWorkStorage();
+            // }
+            //
+            // // var asyncLocalValueChangedArgs = 
+            // // asyncLocalValueChangedArgs.PreviousValue
+            // _unitOfWorkCell.Value.UnitOfWorks.Add(unitOfWork);
+            // if (unitOfWork is UnitOfWork)
+            // {
+            //     _unitOfWorkCell.Value.ActualUnitOfWorks.Add(unitOfWork);
+            //     unitOfWork.OnDisposed += (_, _) =>
+            //     {
+            //         _unitOfWorkCell.Value.ActualUnitOfWorks.Remove(unitOfWork);
+            //     };
+            // }
+        }
+
+
+        static AmbientUnitOfWork()
+        {
+            if (_current == null)
+            {
+                lock (typeof(AmbientUnitOfWork))
+                {
+                    if (_current == null)
+                    {
+                        _current = new AmbientUnitOfWork();
+                    }
+                }
+            }
         }
     }
 }

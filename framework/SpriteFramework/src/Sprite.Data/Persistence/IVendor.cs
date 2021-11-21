@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 
 namespace Sprite.Data.Persistence
 {
@@ -7,6 +8,6 @@ namespace Sprite.Data.Persistence
     /// </summary>
     public interface IVendor : IDisposable
     {
-        bool IsDispose { get; }
+        DbConnection DbConnection { get; }
     }
 }

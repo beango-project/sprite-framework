@@ -13,5 +13,9 @@ namespace Sprite.Modular
         IModule ModuleInstance { get; }
 
         IReadOnlySet<IModuleDefinition> DependModules { get; }
+
+        IReadOnlySet<IModuleProcessor> Processors { get; }
+
+        bool IsSkipAutoScanRegister { get; }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Sprite.Data.Entities;
+using Sprite.Data.Uow;
 
 namespace Sprite.Data.Repositories
 {
@@ -15,12 +16,23 @@ namespace Sprite.Data.Repositories
 
     public interface IRepository<TEntity> : IRepository, IQueryable<TEntity> where TEntity : class, IEntity
     {
-        // IUnitOfWorkManager UnitOfWorkManager { get; }
-
+        /// <summary>
+        /// 根据表达式获取实体
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns>实体</returns>
         TEntity Get([NotNull] Expression<Func<TEntity, bool>> predicate);
 
+        /// <summary>
+        /// 获取全部
+        /// </summary>
+        /// <returns>全部实体结果集</returns>
         IQueryable<TEntity> GetAll();
 
+        /// <summary>
+        /// 获取全部，可提取导航属性
+        /// </summary>
+        /// <returns>全部实体结果集</returns>
         IQueryable<TEntity> GetAll(params Expression<Func<TEntity, object>>[] propertySelectors);
 
 
@@ -59,6 +71,7 @@ namespace Sprite.Data.Repositories
 
 
         Task<IQueryable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] propertySelectors);
+        
 
 
         IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
@@ -85,6 +98,16 @@ namespace Sprite.Data.Repositories
         Task<TEntity> UpdateAsync([NotNull] TEntity entity, bool autoSave = false, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// 执行非查询更新
+        /// </summary>
+        /// <param name="autoSave"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync([NotNull] Expression<Func<TEntity, bool>> predicate, [NotNull] Expression<Func<TEntity, TEntity>> expression, bool autoSave = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Updates multiple entities.
         /// </summary>
         /// <param name="entities">Entities to be updated.</param>
@@ -97,6 +120,18 @@ namespace Sprite.Data.Repositories
         Task UpdateManyAsync([NotNull] IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default);
 
         Task DeleteAsync([NotNull] TEntity entity, bool autoSave = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// An IQueryable&lt;T&gt; extension method that deletes all rows asynchronously from the query
+        /// without retrieving entities.
+        /// </summary>
+        /// <typeparam name="T">The type of elements of the query.</typeparam>
+        /// <param name="predicate"></param>
+        /// <param name="autoSave"></param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="query">The query to delete rows from without retrieving entities.</param>
+        /// <returns>A task with the number of rows affected.</returns>
+        Task<int> DeleteAsync([NotNull] Expression<Func<TEntity, bool>> predicate, bool autoSave = false, CancellationToken cancellationToken = default);
 
         Task<int> DeleteManyAsync(Expression<Func<TEntity, bool>> predicate, bool autoSave = false, CancellationToken cancellationToken = default);
 
@@ -125,20 +160,23 @@ namespace Sprite.Data.Repositories
         Task<TEntity> SingleAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// 根据 Lambda 条件 predicate 获取一个单一对象，如果没有或者有多个，抛出异常
+        /// 根据 Lambda 条件 predicate 获取一个单一对象，如果没有则返回默认值，有多个则抛出异常
         /// </summary>
         /// <param name="predicate"></param>
-        TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);
+        /// <param name="cancellationToken"></param>
+        TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken);
 
         /// <summary>
-        /// 异步方法，根据 Lambda 条件 predicate 获取一个单一对象，如果没有或者有多个，抛出异常
+        /// 异步方法， 根据 Lambda 条件 predicate 获取一个单一对象，如果没有则返回默认值，有多个则抛出异常
         /// </summary>
         /// <param name="predicate"></param>
         Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+        
+        // Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
     }
 
     public interface IRepository<TEntity, TKey> : IRepository<TEntity>
-        where TEntity : class, IEntity<TKey>
+        where TEntity : class, IEntity<TKey> where TKey : IEquatable<TKey>
     {
         /// <summary>
         /// 获取具有给定主键的实体。
@@ -146,6 +184,8 @@ namespace Sprite.Data.Repositories
         /// <param name="id"></param>
         /// <returns></returns>
         TEntity Get(TKey id);
+
+        TEntity Get(TKey id, params Expression<Func<TEntity, object>>[] propertySelectors);
 
         /// <summary>
         /// Gets an entity with given primary key.
@@ -157,6 +197,7 @@ namespace Sprite.Data.Repositories
         /// <returns>Entity</returns>
         Task<TEntity> GetAsync(TKey id, CancellationToken cancellationToken = default);
 
+        Task<TEntity> GetAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] propertySelectors);
 
         TEntity Find(TKey id);
 

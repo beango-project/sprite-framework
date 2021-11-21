@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Sprite.Modular
 {
@@ -7,12 +8,26 @@ namespace Sprite.Modular
     /// </summary>
     public abstract class Module : IModule
     {
-        public void ConfigureServices(IServiceCollection service)
+        public static Func<Type, bool> IsCandidate => x => x.IsClass &&
+                                                           !x.IsAbstract &&
+                                                           !x.IsGenericType &&
+                                                           typeof(IModule).IsAssignableFrom(x);
+
+        public virtual void ConfigureServices(IServiceCollection services)
         {
         }
 
-        public void Configure(OnApplicationInitContext context)
+        /// <summary>
+        /// 检查是否符合规约（是否为一个Sprite模块）
+        /// </summary>
+        /// <param name="type"></param>
+        /// <exception cref="ArgumentException"></exception>
+        internal static void CheckIsCandidate(Type type)
         {
+            if (!IsCandidate(type))
+            {
+                throw new ArgumentException($"The given type is not a Sprite module :{type.AssemblyQualifiedName}");
+            }
         }
     }
 }

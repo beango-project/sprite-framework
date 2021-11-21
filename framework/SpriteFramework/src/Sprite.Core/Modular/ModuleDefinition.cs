@@ -6,28 +6,33 @@ namespace Sprite.Modular
 {
     public class ModuleDefinition : IModuleDefinition
     {
-        public Type Module { get; }
-        public IModule ModuleInstance { get; }
-
-        public IReadOnlySet<IModuleDefinition> DependModules => _dependModules.ToImmutableHashSet();
-
         private readonly HashSet<IModuleDefinition> _dependModules;
 
-        public ModuleDefinition(Type module, IModule moduleInstance)
+        private readonly HashSet<IModuleProcessor> _processors;
+
+        public ModuleDefinition(Type module, IModule moduleInstance, bool isSkipAutoScanRegister = false, HashSet<IModuleProcessor> processors = null)
         {
-            Guard.CheckNotNull(module, nameof(module));
-            Guard.CheckNotNull(moduleInstance, nameof(moduleInstance));
+            Check.NotNull(module, nameof(module));
+            Check.NotNull(moduleInstance, nameof(moduleInstance));
 
             Module = module;
             ModuleInstance = moduleInstance;
-            this._dependModules = new HashSet<IModuleDefinition>();
+            IsSkipAutoScanRegister = isSkipAutoScanRegister;
+            _processors = processors ?? new HashSet<IModuleProcessor>();
+            _dependModules = new HashSet<IModuleDefinition>();
         }
+
+        public Type Module { get; }
+        public IModule ModuleInstance { get; }
+        public IReadOnlySet<IModuleDefinition> DependModules => _dependModules.ToImmutableHashSet();
+        public IReadOnlySet<IModuleProcessor> Processors => _processors.ToImmutableHashSet();
+        public bool IsSkipAutoScanRegister { get; }
 
         public void AddDependModules(IModuleDefinition moduleDefinition)
         {
-            if (!this._dependModules.Contains(moduleDefinition))
+            if (!_dependModules.Contains(moduleDefinition))
             {
-                this._dependModules.Add(moduleDefinition);
+                _dependModules.Add(moduleDefinition);
             }
         }
     }

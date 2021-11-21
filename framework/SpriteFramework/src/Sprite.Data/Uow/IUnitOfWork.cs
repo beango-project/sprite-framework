@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Sprite.Data.Entities;
 using Sprite.Data.Persistence;
+using Sprite.Data.Repositories;
 using Sprite.Data.Transaction;
+using Sprite.DependencyInjection;
 
 namespace Sprite.Data.Uow
 {
@@ -10,49 +17,46 @@ namespace Sprite.Data.Uow
     {
         Guid Id { get; }
 
-        IVendor Vendor { get; }
+        bool IsDisposed { get; }
+
+        bool IsCompleted { get; }
+
+        bool IsSupportTransaction { get; }
+        
+        IUnitOfWork Outer { get; set; }
 
         TransactionOptions Options { get; }
 
-        /// <summary>
-        /// 是否被销毁
-        /// </summary>
-        bool IsDisposed { get; }
+        IVendor GetOrAddVendor(string key, IVendor vendor);
 
-        /// <summary>
-        /// 是否完成
-        /// </summary>
-        bool IsCompleted { get; }
+        [CanBeNull]
+        IVendor FindVendor(string key);
 
-        event EventHandler Disposed;
+        [CanBeNull]
+        DbTransaction FindDbTransaction(string key);
 
-        public int SaveChanges();
+        void AddDbTransaction(string key, DbTransaction dbTransaction);
 
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        IReadOnlyList<IVendor> GetVendors();
 
-        /// <summary>
-        /// 提交事务
-        /// </summary>
-        void Commit();
+        int SaveChanges();
 
-        /// <summary>
-        /// 异步提交事务
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task CommitAsync(CancellationToken cancellationToken);
 
-        /// <summary>
-        /// 回滚
-        /// </summary>
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+
         void Rollback();
 
-        /// <summary>
-        /// 异步回滚
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task RollBackAsync(CancellationToken cancellationToken);
+
+        Task RollbackAsync(CancellationToken cancellationToken = default);
+
+        void Completed();
+
+        Task CompletedAsync(CancellationToken cancellationToken = default);
+
+        public event EventHandler OnCompleted;
+        public event EventHandler OnFailed;
+        public event EventHandler OnDisposed;
     }
 }
