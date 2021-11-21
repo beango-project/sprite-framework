@@ -11,8 +11,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Security.Abstractions\Sprite.Security.Abstractions.csproj"/>
-        <ProjectReference Include="..\Sprite.Web.Common\Sprite.Web.Common.csproj"/>
+        <ProjectReference Include="..\Sprite.Security.Abstractions\Sprite.Security.Abstractions.csproj" />
+        <ProjectReference Include="..\Sprite.Web.Common\Sprite.Web.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\" />
     </ItemGroup>
 
 </Project>

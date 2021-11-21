@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sprite.Castle.Core\Sprite.Castle.Core.csproj" />
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
+        <ProjectReference Include="..\Sprite.Data\Sprite.Data.csproj" />
+        <ProjectReference Include="..\Sprite.Security.Abstractions\Sprite.Security.Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Abstractions" />
+        <Folder Include="Caches" />
+        <Folder Include="Identity\Repositores" />
+        <Folder Include="Properties\" />
+    </ItemGroup>
+
+</Project>
