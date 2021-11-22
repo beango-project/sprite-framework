@@ -6,7 +6,7 @@ namespace Sprite.Swashbuckle.AspNetCore
     /// Sprite swashbuckle AspNetCore module
     /// </summary>
     [Usage(typeof(SpriteSwashbuckleAspNetCoreConfigure))]
-    public class SpriteSwashbuckleAspNetCoreModule : Module
+    public class SpriteSwashbuckleAspNetCoreSpriteModule : SpriteModule
     {
     }
 }

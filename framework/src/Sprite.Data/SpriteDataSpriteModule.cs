@@ -4,7 +4,7 @@ using Sprite.Modular;
 
 namespace Sprite.Data
 {
-    public class SpriteDataModule : Module
+    public class SpriteDataSpriteModule : SpriteModule
     {
         public override void ConfigureServices(IServiceCollection services)
         {

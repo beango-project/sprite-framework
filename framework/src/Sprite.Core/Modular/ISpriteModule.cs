@@ -2,7 +2,7 @@
 
 namespace Sprite.Modular
 {
-    public interface IModule
+    public interface ISpriteModule
     {
         void ConfigureServices(IServiceCollection services);
     }

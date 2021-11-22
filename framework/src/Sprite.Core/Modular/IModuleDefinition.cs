@@ -10,7 +10,7 @@ namespace Sprite.Modular
     {
         Type Module { get; }
 
-        IModule ModuleInstance { get; }
+        ISpriteModule SpriteModuleInstance { get; }
 
         IReadOnlySet<IModuleDefinition> DependModules { get; }
 

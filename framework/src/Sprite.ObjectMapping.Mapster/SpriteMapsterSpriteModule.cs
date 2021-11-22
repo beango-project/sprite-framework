@@ -7,7 +7,7 @@ using Sprite.Modular;
 
 namespace Sprite.ObjectMapping.Mapster
 {
-    public class SpriteMapsterModule : Module
+    public class SpriteMapsterSpriteModule : SpriteModule
     {
         public override void ConfigureServices(IServiceCollection services)
         {

@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mapster" Version="7.2.0"/>
+        <PackageReference Include="Mapster" Version="7.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
     </ItemGroup>
 
 </Project>

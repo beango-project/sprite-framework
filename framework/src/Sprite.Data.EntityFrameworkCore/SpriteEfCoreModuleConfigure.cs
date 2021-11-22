@@ -6,7 +6,7 @@ namespace Sprite.Data.EntityFrameworkCore
     {
         public override void Configure()
         {
-            ImportModules(typeof(SpriteDataModule));
+            ImportModules(typeof(SpriteDataSpriteModule));
         }
     }
 }

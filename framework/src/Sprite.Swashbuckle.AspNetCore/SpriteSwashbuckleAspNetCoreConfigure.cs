@@ -13,7 +13,7 @@ namespace Sprite.Swashbuckle.AspNetCore
         /// </summary>
         public override void Configure()
         {
-            ImportModules(typeof(SpriteAspNetCoreMvcModule));
+            ImportModules(typeof(SpriteAspNetCoreMvcSpriteModule));
         }
     }
 }

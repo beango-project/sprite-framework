@@ -6,12 +6,12 @@ namespace Sprite.Modular
     /// <summary>
     /// 基础模块
     /// </summary>
-    public abstract class Module : IModule
+    public abstract class SpriteModule : ISpriteModule
     {
         public static Func<Type, bool> IsCandidate => x => x.IsClass &&
                                                            !x.IsAbstract &&
                                                            !x.IsGenericType &&
-                                                           typeof(IModule).IsAssignableFrom(x);
+                                                           typeof(ISpriteModule).IsAssignableFrom(x);
 
         public virtual void ConfigureServices(IServiceCollection services)
         {

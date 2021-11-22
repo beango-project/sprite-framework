@@ -5,7 +5,7 @@ using Sprite.Modular;
 
 namespace Sprite.AspNetCore
 {
-    public class SpriteAspNetCoreModule : Module
+    public class SpriteAspNetCoreSpriteModule : SpriteModule
     {
         public override void ConfigureServices(IServiceCollection services)
         {

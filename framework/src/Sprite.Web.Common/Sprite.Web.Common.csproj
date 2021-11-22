@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
     </ItemGroup>
 
 </Project>

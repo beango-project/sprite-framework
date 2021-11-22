@@ -10,7 +10,7 @@ namespace Sprite.DependencyInjection
     {
         public static IMountSpriteApplicationContext AddSprite<TStartupModule>([NotNull] this IServiceCollection services,
             [CanBeNull] Action<SpriteApplicationCreateOptions> optionsAction = null)
-            where TStartupModule : IModule
+            where TStartupModule : ISpriteModule
         {
             return SpriteApplication.Build<TStartupModule>(services, optionsAction);
         }

@@ -56,7 +56,7 @@ namespace Sprite.Modular
 
         private void AddModulesDndResolveDependencies(List<Type> moduleTypes, Type tModuleType)
         {
-            Module.CheckIsCandidate(tModuleType);
+            SpriteModule.CheckIsCandidate(tModuleType);
 
             if (moduleTypes.Contains(tModuleType))
             {

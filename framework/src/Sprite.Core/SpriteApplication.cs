@@ -23,14 +23,14 @@ namespace Sprite
 
 
         public static IConventionalSpriteApplicationContext Build<TRootModuleType>([CanBeNull] Action<SpriteApplicationCreateOptions> optionAction = null)
-            where TRootModuleType : IModule
+            where TRootModuleType : ISpriteModule
         {
             return new ConventionalSpriteApplicationContext(typeof(TRootModuleType), optionAction);
         }
 
         public static IMountSpriteApplicationContext Build<TRootModuleType>([NotNull] IServiceCollection services,
             [CanBeNull] Action<SpriteApplicationCreateOptions> optionAction = null)
-            where TRootModuleType : IModule
+            where TRootModuleType : ISpriteModule
         {
             return new MountSpriteApplicationContext(typeof(TRootModuleType), services, optionAction);
         }
