@@ -28,7 +28,7 @@ using Sprite.Security.Authorization;
 namespace Sprite.AspNetCore.Mvc
 {
     [Usage(typeof(SpriteAspNetCoreMvcConfigure))]
-    public class SpriteAspNetCoreMvcSpriteModule : SpriteModule
+    public class SpriteAspNetCoreMvcModule : SpriteModule
     {
         public override void ConfigureServices(IServiceCollection services)
         {
@@ -126,7 +126,7 @@ namespace Sprite.AspNetCore.Mvc
 
             // Add a custom controller checker
             partManager.FeatureProviders.Add(new SpriteConventionControllerFeatureProvider(context));
-            partManager.ApplicationParts.AddIfNotContains<SpriteAspNetCoreMvcSpriteModule>();
+            partManager.ApplicationParts.AddIfNotContains<SpriteAspNetCoreMvcModule>();
 
 
             services.Configure<MvcOptions>(options =>

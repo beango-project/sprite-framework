@@ -6,7 +6,7 @@ namespace Sprite.AspNetCore.Mvc
     {
         public override void Configure()
         {
-            ImportModules(typeof(SpriteAspNetCoreSpriteModule));
+            ImportModules(typeof(SpriteAspNetCoreModule));
         }
     }
 }

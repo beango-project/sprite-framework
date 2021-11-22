@@ -7,7 +7,7 @@ namespace Sprite.AspNetCore
     {
         public override void Configure()
         {
-            ImportModules(typeof(SpriteWebSpriteModule));
+            ImportModules(typeof(SpriteWebModule));
         }
     }
 }

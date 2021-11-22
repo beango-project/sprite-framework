@@ -48,7 +48,7 @@ namespace Sprite.Modular
 
         private void ProcessModuleConfigure(OnApplicationContext context, IModuleDefinition module)
         {
-            var configureMethod = module.SpriteModuleInstance.GetType().GetMethod(ModuleConfigureName);
+            var configureMethod = module.ModuleInstance.GetType().GetMethod(ModuleConfigureName);
             if (configureMethod == null)
             {
                 return;
@@ -80,7 +80,7 @@ namespace Sprite.Modular
                     }
                 }
 
-                configureMethod.Invoke(module.SpriteModuleInstance, methodsParameters);
+                configureMethod.Invoke(module.ModuleInstance, methodsParameters);
             }
         }
 

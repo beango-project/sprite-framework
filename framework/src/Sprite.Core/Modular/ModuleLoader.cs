@@ -33,7 +33,7 @@ namespace Sprite.Modular
         {
             foreach (var moduleDefinition in moduleDefinitions)
             {
-                if (moduleDefinition.SpriteModuleInstance is SpriteModule)
+                if (moduleDefinition.ModuleInstance is SpriteModule)
                 {
                     //TODO We can extract ConfigureServicesProcessors ?
                     var configureServicesProcessors = moduleDefinition.Processors.AsParallel().OfType<IConfigureServicesProcessor>().OrderBy(x => x.Order);
@@ -48,7 +48,7 @@ namespace Sprite.Modular
                         configureServicesProcessor.BeforeConfigureServices(_services);
                     }
                     
-                    moduleDefinition.SpriteModuleInstance.ConfigureServices(_services);
+                    moduleDefinition.ModuleInstance.ConfigureServices(_services);
 
                     foreach (var configureServicesProcessor in configureServicesProcessors)
                     {
