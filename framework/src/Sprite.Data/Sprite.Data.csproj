@@ -10,13 +10,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
-        <ProjectReference Include="..\Sprite.Data.Common\Sprite.Data.Common.csproj"/>
-        <ProjectReference Include="..\Sprite.UidGenerator\Sprite.UidGenerator.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="Uow\UnitOfWorkSynchronizer.cs"/>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
+        <ProjectReference Include="..\Sprite.Data.Common\Sprite.Data.Common.csproj" />
+        <ProjectReference Include="..\Sprite.UidGenerator\Sprite.UidGenerator.csproj" />
     </ItemGroup>
 
 </Project>

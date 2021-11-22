@@ -10,24 +10,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspectInjector" Version="2.6.0"/>
-        <PackageReference Include="FastExpressionCompiler" Version="3.2.1"/>
-        <PackageReference Include="FastExpressionCompiler.LightExpression" Version="3.2.1"/>
-        <PackageReference Include="ImTools.dll" Version="3.1.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0"/>
-        <PackageReference Include="Nito.AsyncEx" Version="5.1.2"/>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0"/>
-        <PackageReference Include="System.Linq.Async" Version="5.0.0"/>
+        <PackageReference Include="AspectInjector" Version="2.6.0" />
+        <PackageReference Include="FastExpressionCompiler" Version="3.2.1" />
+        <PackageReference Include="FastExpressionCompiler.LightExpression" Version="3.2.1" />
+        <PackageReference Include="ImTools.dll" Version="3.1.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+        <PackageReference Include="System.Linq.Async" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Logging"/>
-        <Folder Include="System\Object"/>
+        <Folder Include="Logging" />
+        <Folder Include="System\Object" />
     </ItemGroup>
 
 </Project>

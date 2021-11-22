@@ -33,7 +33,7 @@ namespace Sprite.Modular
         {
             foreach (var moduleDefinition in moduleDefinitions)
             {
-                if (moduleDefinition.ModuleInstance is Module)
+                if (moduleDefinition.ModuleInstance is SpriteModule)
                 {
                     //TODO We can extract ConfigureServicesProcessors ?
                     var configureServicesProcessors = moduleDefinition.Processors.AsParallel().OfType<IConfigureServicesProcessor>().OrderBy(x => x.Order);
@@ -99,9 +99,9 @@ namespace Sprite.Modular
         }
 
 
-        private IModule CreateAndAddInServicesModule(Type moduleType)
+        private ISpriteModule CreateAndAddInServicesModule(Type moduleType)
         {
-            var module = (IModule) Activator.CreateInstance(moduleType);
+            var module = (ISpriteModule) Activator.CreateInstance(moduleType);
             _services.AddSingleton(moduleType, module);
             return module;
         }

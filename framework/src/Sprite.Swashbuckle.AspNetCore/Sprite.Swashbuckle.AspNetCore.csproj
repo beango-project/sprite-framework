@@ -13,11 +13,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.AspNetCore.Mvc\Sprite.AspNetCore.Mvc.csproj"/>
+        <ProjectReference Include="..\Sprite.AspNetCore.Mvc\Sprite.AspNetCore.Mvc.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
 </Project>

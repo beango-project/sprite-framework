@@ -10,7 +10,7 @@ namespace Sprite.Modular
 
         private readonly HashSet<IModuleProcessor> _processors;
 
-        public ModuleDefinition(Type module, IModule moduleInstance, bool isSkipAutoScanRegister = false, HashSet<IModuleProcessor> processors = null)
+        public ModuleDefinition(Type module, ISpriteModule moduleInstance, bool isSkipAutoScanRegister = false, HashSet<IModuleProcessor> processors = null)
         {
             Check.NotNull(module, nameof(module));
             Check.NotNull(moduleInstance, nameof(moduleInstance));
@@ -23,7 +23,7 @@ namespace Sprite.Modular
         }
 
         public Type Module { get; }
-        public IModule ModuleInstance { get; }
+        public ISpriteModule ModuleInstance { get; }
         public IReadOnlySet<IModuleDefinition> DependModules => _dependModules.ToImmutableHashSet();
         public IReadOnlySet<IModuleProcessor> Processors => _processors.ToImmutableHashSet();
         public bool IsSkipAutoScanRegister { get; }

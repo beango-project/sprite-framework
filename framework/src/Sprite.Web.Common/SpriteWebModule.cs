@@ -2,7 +2,7 @@
 
 namespace Sprite.Web
 {
-    public class SpriteWebModule : Module
+    public class SpriteWebModule : SpriteModule
     {
     }
 }
