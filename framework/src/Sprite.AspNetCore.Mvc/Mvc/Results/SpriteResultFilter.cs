@@ -12,7 +12,7 @@ using Sprite.Web.Attributes;
 
 namespace Sprite.AspNetCore.Mvc.Results
 {
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     public class SpriteResultFilter : IAsyncResultFilter
     {
         public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
@@ -84,7 +84,7 @@ namespace Sprite.AspNetCore.Mvc.Results
         private AspNetCoreMvcOptions GetAndSetOptions(IServiceProvider serviceProvider)
         {
             var swapSpace = serviceProvider.GetRequiredService<SwapSpace>();
-            var mvcOptions = swapSpace.TryGet<IOptions<AspNetCoreMvcOptions>>();
+            swapSpace.TryGet<IOptions<AspNetCoreMvcOptions>>(out var mvcOptions);
 
             if (mvcOptions == null)
             {

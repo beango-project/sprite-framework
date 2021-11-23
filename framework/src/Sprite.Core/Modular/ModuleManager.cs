@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sprite.DependencyInjection;
@@ -13,6 +15,7 @@ namespace Sprite.Modular
 
         private readonly IModuleStore _moduleStore;
 
+        [CanBeNull]
         private ISwapSpace _swapSpace;
 
         public ModuleManager(IModuleStore moduleStore, ILogger<ModuleManager> logger)
@@ -36,12 +39,9 @@ namespace Sprite.Modular
             foreach (var module in _moduleStore.ModuleMaps)
             {
                 var processors = module.Processors;
-                foreach (var processor in processors)
+                foreach (var shutdownProcessor in processors.OfType<IModuleShutdownProcessor>().OrderBy(p => p.Order))
                 {
-                    if (processor is IModuleShutdownProcessor shutdownProcessor)
-                    {
-                        shutdownProcessor.Shutdown(context);
-                    }
+                    shutdownProcessor.Shutdown(context);
                 }
             }
         }
@@ -69,9 +69,9 @@ namespace Sprite.Modular
 
                     try
                     {
-                        var findValue = _swapSpace.TryGet(parameters[i].ParameterType) ?? context.ServiceProvider.GetRequiredService(parameters[i].ParameterType);
-
-                        methodsParameters[i] = findValue;
+                        _swapSpace.TryGet(parameters[i].ParameterType, out var findValue);
+                        // If it is not found in the swap area, it will be resolved in the container
+                        methodsParameters[i] = findValue ?? context.ServiceProvider.GetRequiredService(parameters[i].ParameterType);
                     }
                     catch (Exception ex)
                     {

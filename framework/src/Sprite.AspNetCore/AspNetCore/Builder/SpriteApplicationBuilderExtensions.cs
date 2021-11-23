@@ -24,6 +24,9 @@ namespace Sprite.AspNetCore.AspNetCore.Builder
             applicationLifetime.ApplicationStopped.Register(() => { context.Dispose(); });
 
             context.Run(app.ApplicationServices);
+
+            //TODO: Remove ServiceProvider object from swap, move in  Run()?
+            swapSpace.Remove<IApplicationBuilder>();
         }
     }
 }

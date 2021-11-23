@@ -95,10 +95,5 @@ namespace System.Reflection
 
             return IsAssignableToGenericType(givenTypeInfo.BaseType, genericType);
         }
-
-        private class MyClass
-        {
-            public DateTime Now { get; set; }
-        }
     }
 }

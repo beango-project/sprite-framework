@@ -6,7 +6,7 @@ namespace Sprite.ObjectMapping
     /// <summary>
     /// 对象映射空实现类
     /// </summary>
-    [Register(ServiceLifetime.Singleton)]
+    [Component(ServiceLifetime.Singleton)]
     public class NullObjectMapper : IObjectMapper
     {
         public TDestination Map<TDestination>(object source)

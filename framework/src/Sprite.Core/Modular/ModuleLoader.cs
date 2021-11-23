@@ -101,7 +101,7 @@ namespace Sprite.Modular
 
         private ISpriteModule CreateAndAddInServicesModule(Type moduleType)
         {
-            var module = (ISpriteModule) Activator.CreateInstance(moduleType);
+            var module = (ISpriteModule) Activator.CreateInstance(moduleType)!;
             _services.AddSingleton(moduleType, module);
             return module;
         }

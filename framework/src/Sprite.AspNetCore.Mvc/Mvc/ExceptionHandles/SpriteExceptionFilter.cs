@@ -13,7 +13,7 @@ using Sprite.Remote;
 
 namespace Sprite.AspNetCore.Mvc.ExceptionHandles
 {
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     public class SpriteExceptionFilter : IAsyncExceptionFilter
     {
         public async Task OnExceptionAsync(ExceptionContext context)

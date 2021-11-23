@@ -16,7 +16,7 @@ namespace Sprite.DependencyInjection
     {
         public override void AddFromTypeOf(IServiceCollection services, Type type)
         {
-            var registerAttribute = type.GetCustomAttribute<RegisterAttribute>(true);
+            var registerAttribute = type.GetCustomAttribute<ComponentAttribute>(true);
             var serviceLifetime = GetLifeTime(type, registerAttribute);
             if (serviceLifetime == null)
             {
@@ -55,9 +55,8 @@ namespace Sprite.DependencyInjection
                     // }
                     // else
                     // {
-                        services.Add(serviceDescriptor);
+                    services.Add(serviceDescriptor);
                     // }
-                    
                 }
             }
             // exportServiceTypes.ForEach(exportServiceType =>
@@ -155,9 +154,9 @@ namespace Sprite.DependencyInjection
             return exportedTypes.FirstOrDefault(t => t != exportedType && exportedType.IsAssignableFrom(t));
         }
 
-        protected virtual ServiceLifetime? GetLifeTime(Type type, [CanBeNull] RegisterAttribute registerAttribute)
+        protected virtual ServiceLifetime? GetLifeTime(Type type, ComponentAttribute attribute)
         {
-            return registerAttribute?.Scope ?? GetLifetimeFromClassHierarchy(type);
+            return attribute?.Scope ?? GetLifetimeFromClassHierarchy(type);
         }
 
         private ServiceLifetime? GetLifetimeFromClassHierarchy(Type type)

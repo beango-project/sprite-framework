@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Security.Claims;
 using FastExpressionCompiler.LightExpression;
+using JetBrains.Annotations;
 using Sprite;
 
 namespace System.Linq
@@ -116,7 +117,7 @@ namespace System.Linq
         /// <typeparam name="T">表达式实体类型</typeparam>
         /// <param name="rule">查询条件，如果为null，则直接返回 true 表达式</param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> GetExpression<T>(FilterRule rule = null)
+        public static Expression<Func<T, bool>> GetExpression<T>([CanBeNull] FilterRule rule = null)
         {
             var param = Expression.Parameter(typeof(T), "m");
             var body = GetExpressionBody(param, rule);

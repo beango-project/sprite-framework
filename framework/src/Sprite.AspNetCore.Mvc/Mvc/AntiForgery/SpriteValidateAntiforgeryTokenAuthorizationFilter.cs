@@ -12,7 +12,7 @@ using Sprite.Security.Authorization;
 
 namespace Sprite.AspNetCore.Mvc.AntiForgery
 {
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     public class SpriteValidateAntiforgeryTokenAuthorizationFilter : IAsyncAuthorizationFilter, IAntiforgeryPolicy
     {
         private readonly IAntiforgery _antiforgery;

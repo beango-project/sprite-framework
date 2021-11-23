@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 
 namespace Sprite.DependencyInjection
 {
+#nullable enable
     public class SwapSpace : ISwapSpace
     {
         public SwapSpace()
@@ -14,7 +15,9 @@ namespace Sprite.DependencyInjection
 
         private ImHashMap<Type, object> _pool;
 
-        [CanBeNull]
+        public bool IsEmpty => _pool.IsEmpty;
+        public int Count() => _pool.Count();
+
         public object GetSet(Type key, object value)
         {
             if (!_pool.Contains(key))
@@ -41,15 +44,22 @@ namespace Sprite.DependencyInjection
             return _pool.GetValueOrDefault(key);
         }
 
-        public object TryGet(Type key)
+        public bool TryGet(Type key, out object? value)
         {
-            _pool.TryFind(key, out var value);
-            return value;
+            return _pool.TryFind(key, out value);
         }
 
-        public T TryGet<T>()
+        public bool TryGet<T>(out T? value)
         {
-            return (T)TryGet(typeof(T));
+            var find = TryGet(typeof(T), out var value2);
+
+            if (find)
+            {
+                value = (T)value2;
+            }
+
+            value = default;
+            return find;
         }
 
         public T Get<T>()
@@ -102,6 +112,24 @@ namespace Sprite.DependencyInjection
         public void Set<T>(object value)
         {
             Set(typeof(T), value);
+        }
+
+        public void Remove(Type key)
+        {
+            Check.NotNull(key, nameof(key));
+            _pool.Remove(key);
+        }
+
+        public void Remove<T>()
+        {
+            var key = typeof(T);
+            Check.NotNull(key, nameof(key));
+            _pool.Remove(key);
+        }
+
+        public void Clear()
+        {
+            _pool = ImHashMap<Type, object>.Empty;
         }
     }
 }
