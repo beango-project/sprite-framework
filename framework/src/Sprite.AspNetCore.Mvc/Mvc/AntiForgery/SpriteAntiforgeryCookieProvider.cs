@@ -6,7 +6,7 @@ using Sprite.DependencyInjection.Attributes;
 
 namespace Sprite.AspNetCore.Mvc.AntiForgery
 {
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     public class SpriteAntiforgeryCookieProvider
     {
         private readonly SpriteAntiforgeryOptions _antiforgeryOptions;

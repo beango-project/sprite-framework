@@ -11,7 +11,7 @@ using Sprite.DependencyInjection.Attributes;
 
 namespace Sprite.AspNetCore.Mvc.AntiForgery
 {
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     public class SpriteAutoValidateAntiforgeryTokenAuthorizationFilter : SpriteValidateAntiforgeryTokenAuthorizationFilter
     {
         private readonly SpriteAntiforgeryOptions _antiForgeryOptions;

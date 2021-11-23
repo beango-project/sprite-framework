@@ -55,7 +55,7 @@ namespace Sprite.DependencyInjection
             return services.GetSingletonInstance<SwapSpace>()?.Get<T>();
         }
 
-        public static SwapSpace GetSwapSpace(this IServiceCollection services)
+        public static ISwapSpace GetSwapSpace(this IServiceCollection services)
         {
             var swapSpace = services.GetSingletonInstance<SwapSpace>();
             if (swapSpace == null)

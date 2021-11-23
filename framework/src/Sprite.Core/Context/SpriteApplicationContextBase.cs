@@ -12,7 +12,8 @@ namespace Sprite.Context
     {
         private readonly IModuleStore _moduleStore;
 
-        public SpriteApplicationContextBase([NotNull] Type rootModuleType, [NotNull] IServiceCollection services, [CanBeNull] Action<SpriteApplicationCreateOptions> optionsAction)
+        public SpriteApplicationContextBase([NotNull] Type rootModuleType, [NotNull] IServiceCollection services, [CanBeNull] Action<SpriteApplicationCreateOptions>
+            optionsAction = null)
         {
             Check.NotNull(rootModuleType, nameof(rootModuleType));
             Check.NotNull(services, nameof(services));
@@ -72,7 +73,7 @@ namespace Sprite.Context
             return moduleLoader.LoadModules();
         }
 
-        public virtual void InitializeModules()
+        protected virtual void Initialize()
         {
             using (var scope = ServiceProvider.CreateScope())
             {

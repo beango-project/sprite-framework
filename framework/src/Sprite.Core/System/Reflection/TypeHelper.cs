@@ -85,6 +85,7 @@ namespace System.Reflection
         }
 
 
+        [CanBeNull]
         private static Type FromClassHierarchyFind2(Type type, Type from, bool isFindInterface = false)
         {
             //如果是接口，则对比接口，如果是类from是接口则获取接口获取
@@ -134,6 +135,7 @@ namespace System.Reflection
 
         static Type FromClassHierarchyFindInterface(Type type, Type from)
         {
+            //TODO:
             if (type.IsClass)
             {
                 var findType = type.GetInterfaces().FirstOrDefault(x => x == from);

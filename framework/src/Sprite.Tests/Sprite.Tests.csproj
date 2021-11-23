@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Shouldly" Version="4.0.3" />
+    </ItemGroup>
+
 </Project>

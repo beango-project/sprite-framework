@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Sprite.DependencyInjection.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class RegisterAttribute : Attribute
+    public class ComponentAttribute : Attribute
     {
         /// <summary>
         /// Service life cycle<see cref="ServiceLifetime"/>
@@ -21,11 +21,12 @@ namespace Sprite.DependencyInjection.Attributes
         /// </summary>
         public virtual bool Replace { get; set; }
 
-        public RegisterAttribute()
+        public ComponentAttribute()
         {
         }
 
-        public RegisterAttribute(ServiceLifetime scope)
+
+        public ComponentAttribute(ServiceLifetime scope)
         {
             this.Scope = scope;
         }

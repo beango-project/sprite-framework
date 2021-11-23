@@ -7,7 +7,7 @@ using Sprite.DependencyInjection.Attributes;
 
 namespace Sprite.AspNetCore.Mvc.Conventions
 {
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     public class SpriteApiBehaviorProvider
     {
         public SpriteApiBehaviorProvider(IOptions<AspNetCoreMvcOptions> mvcOptions, IOptions<ApiVersioningOptions> apiOptions)

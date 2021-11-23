@@ -25,9 +25,9 @@ namespace Sprite.Data.DependencyInjection
             return base.GetExportServiceTypes(type).Where(x => x.IsInterface).ToList();
         }
 
-        protected override ServiceLifetime? GetLifeTime(Type type, RegisterAttribute registerAttribute)
+        protected override ServiceLifetime? GetLifeTime(Type type, ComponentAttribute attribute)
         {
-            return base.GetLifeTime(type, registerAttribute) ?? ServiceLifetime.Transient;
+            return base.GetLifeTime(type, attribute) ?? ServiceLifetime.Transient;
         }
     }
 }

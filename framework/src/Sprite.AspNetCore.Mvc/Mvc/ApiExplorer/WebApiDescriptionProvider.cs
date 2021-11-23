@@ -19,7 +19,7 @@ namespace Sprite.AspNetCore.Mvc.ApiExplorer
     /// Web(Http)ApiDescriptionProvider
     /// 用于处理框架自定义Action的返回
     /// </summary>
-    [Register(ServiceLifetime.Transient)]
+    [Component(ServiceLifetime.Transient)]
     [Export(typeof(IApiDescriptionProvider), typeof(IHybridApiDescriptionProvider))]
     public class WebApiDescriptionProvider : IHybridApiDescriptionProvider
     {

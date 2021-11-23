@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace System
 {
@@ -11,6 +12,7 @@ namespace System
         /// <typeparam name="T"> 动态类型 </typeparam>
         /// <param name="value"> 要转化的源对象 </param>
         /// <returns> 转化后的指定类型的对象，转化失败引发异常。 </returns>
+        [CanBeNull]
         public static T CastTo<T>(this object value)
         {
             if (value == null && default(T) == null)

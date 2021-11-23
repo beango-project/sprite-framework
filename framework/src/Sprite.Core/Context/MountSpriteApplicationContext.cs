@@ -7,7 +7,7 @@ namespace Sprite.Context
     public class MountSpriteApplicationContext : SpriteApplicationContextBase, IMountSpriteApplicationContext
     {
         public MountSpriteApplicationContext([NotNull] Type rootModuleType, [NotNull] IServiceCollection services, [CanBeNull] Action<SpriteApplicationCreateOptions>
-            optionAction) : base(rootModuleType, services, optionAction)
+            optionAction=null) : base(rootModuleType, services, optionAction)
         {
             services.AddSingleton<IMountSpriteApplicationContext>(this);
         }
@@ -16,7 +16,7 @@ namespace Sprite.Context
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
             SetServiceProvider(serviceProvider);
-            InitializeModules();
+            Initialize();
         }
 
         public override void Dispose()

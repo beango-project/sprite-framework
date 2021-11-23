@@ -5,7 +5,7 @@ using Sprite.DynamicProxy;
 
 namespace Sprite.Aspects
 {
-    [Register(ServiceLifetime.Singleton)]
+    [Component(ServiceLifetime.Singleton)]
     public class AspectConfiguration
     {
         public AspectConfiguration(IOptions<InvocationOptions> options)

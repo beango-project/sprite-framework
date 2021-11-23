@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static EffectiveRegistrationRules GetOrCreateEffectiveRegistrationRules(IServiceCollection services)
         {
-            var effectiveRegistrationRules = services.GetSwapSpace().TryGet<EffectiveRegistrationRules>();
+            services.GetSwapSpace().TryGet<EffectiveRegistrationRules>(out var effectiveRegistrationRules);
             if (effectiveRegistrationRules == null)
             {
                 effectiveRegistrationRules = new EffectiveRegistrationRules();
@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddFromAssemblyOf(this IServiceCollection services, Assembly assembly)
         {
             var effectiveRegistrationRules = services.GetEffectiveRegistrationRules();
-            
+
             foreach (var rules in effectiveRegistrationRules.RulesCollection)
             {
                 rules.AddFromAssemblyOf(services, assembly);

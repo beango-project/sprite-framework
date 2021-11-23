@@ -24,7 +24,7 @@ namespace Sprite.Context
         {
             ServiceScope = Services.BuildServiceProviderFromFactory().CreateScope();
             SetServiceProvider(ServiceScope.ServiceProvider);
-            InitializeModules();
+            Initialize();
         }
 
         public override void Dispose()

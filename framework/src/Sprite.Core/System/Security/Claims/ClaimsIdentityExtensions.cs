@@ -7,6 +7,7 @@ namespace System.Security.Claims
     public static class ClaimsIdentityExtensions
     {
         [CanBeNull]
+        #nullable enable
         public static Claim? GetCurrentUser([NotNull] this ClaimsPrincipal principal)
         {
             Check.NotNull(principal, nameof(principal));
