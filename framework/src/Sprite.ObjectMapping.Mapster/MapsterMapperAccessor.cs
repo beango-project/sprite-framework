@@ -2,7 +2,7 @@
 
 namespace Sprite.ObjectMapping.Mapster
 {
-    internal class MapperAccessor : IMapperAccessor
+    internal class MapsterMapperAccessor : IMapperAccessor
     {
         public IMapper Mapper { get; set; }
     }

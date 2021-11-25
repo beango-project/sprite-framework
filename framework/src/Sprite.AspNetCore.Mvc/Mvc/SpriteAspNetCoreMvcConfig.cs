@@ -2,7 +2,7 @@
 
 namespace Sprite.AspNetCore.Mvc
 {
-    public class SpriteAspNetCoreMvcConfigure : ModuleConfigure
+    public class SpriteAspNetCoreMvcConfig : ModuleConfig
     {
         public override void Configure()
         {

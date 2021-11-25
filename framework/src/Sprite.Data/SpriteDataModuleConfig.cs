@@ -2,7 +2,7 @@
 
 namespace Sprite.Data
 {
-    public class SpriteDataModuleConfigure: ModuleConfigure
+    public class SpriteDataModuleConfig: ModuleConfig
     {
         public override void Configure()
         {

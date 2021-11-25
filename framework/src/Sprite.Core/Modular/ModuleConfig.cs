@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Sprite.Modular
 {
-    public abstract class ModuleConfigure
+    public abstract class ModuleConfig
     {
         protected internal bool SkipAutoScanRegister = false;
 

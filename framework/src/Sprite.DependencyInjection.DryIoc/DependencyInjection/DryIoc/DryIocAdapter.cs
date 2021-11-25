@@ -323,7 +323,7 @@ namespace DryIoc.Microsoft.DependencyInjection
                 var reuse = descriptor.Lifetime == ServiceLifetime.Singleton ? Reuse.Singleton
                     : descriptor.Lifetime == ServiceLifetime.Scoped ? Reuse.ScopedOrSingleton
                     : Reuse.Transient;
-                
+
                 container.Register(descriptor.ServiceType, descriptor.ImplementationType, reuse);
             }
             else if (descriptor.ImplementationFactory != null)

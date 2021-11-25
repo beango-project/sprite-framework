@@ -11,7 +11,7 @@ namespace Sprite.Core.Tests.Context
         [Fact]
         public void Conventional_App_Run_Test()
         {
-            var applicationContext = new ConventionalSpriteApplicationContext(typeof(RootStartupModule), config => { });
+            var applicationContext = new ConventionalSpriteApplicationContext(typeof(RootStartupModule));
 
             applicationContext.RootModuleType.ShouldBe(typeof(RootStartupModule));
             applicationContext.Run();

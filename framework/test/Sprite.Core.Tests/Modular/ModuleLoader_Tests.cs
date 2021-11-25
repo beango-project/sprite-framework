@@ -13,7 +13,7 @@ namespace Sprite.Core.Tests.Modular
         [Fact]
         public void ModuleConfigure_Depend_Modules_ShouldBe_Import_Modules()
         {
-            var configure = new RootStartupModuleConfigure();
+            var configure = new RootStartupModuleConfig();
             configure.Configure();
             configure.DependedModules.Length.ShouldBe(1);
             configure.DependedModules[0].ShouldBe(typeof(EmptyModule));
@@ -48,7 +48,7 @@ namespace Sprite.Core.Tests.Modular
         }
     }
 
-    public class RootStartupModuleConfigure : ModuleConfigure
+    public class RootStartupModuleConfig : ModuleConfig
     {
         public override void Configure()
         {
@@ -57,7 +57,7 @@ namespace Sprite.Core.Tests.Modular
         }
     }
 
-    [Usage(typeof(RootStartupModuleConfigure))]
+    [Usage(typeof(RootStartupModuleConfig))]
     public class RootStartupModule : SpriteModule
     {
         public SpriteModule ConfigureInjectModule { get; set; }

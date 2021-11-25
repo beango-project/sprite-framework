@@ -6,13 +6,13 @@ namespace Sprite.Context
 {
     public class ConventionalSpriteApplicationContext : SpriteApplicationContextBase, IConventionalSpriteApplicationContext
     {
-        public ConventionalSpriteApplicationContext([NotNull] Type rootModuleType, [CanBeNull] Action<SpriteApplicationCreateOptions> optionAction)
-            : this(rootModuleType, new ServiceCollection(), optionAction)
+        public ConventionalSpriteApplicationContext([NotNull] Type rootModuleType, [CanBeNull] Action<SpriteApplicationCreateOptions> options = null)
+            : this(rootModuleType, new ServiceCollection(), options)
         {
         }
 
         private ConventionalSpriteApplicationContext([NotNull] Type rootModuleType, [NotNull] IServiceCollection services,
-            [CanBeNull] Action<SpriteApplicationCreateOptions> optionAction) : base(rootModuleType, services, optionAction)
+            [CanBeNull] Action<SpriteApplicationCreateOptions> options = null) : base(rootModuleType, services, options)
         {
             Services.AddSingleton<IConventionalSpriteApplicationContext>(this);
         }

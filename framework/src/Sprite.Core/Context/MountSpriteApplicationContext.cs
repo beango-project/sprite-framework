@@ -7,7 +7,7 @@ namespace Sprite.Context
     public class MountSpriteApplicationContext : SpriteApplicationContextBase, IMountSpriteApplicationContext
     {
         public MountSpriteApplicationContext([NotNull] Type rootModuleType, [NotNull] IServiceCollection services, [CanBeNull] Action<SpriteApplicationCreateOptions>
-            optionAction=null) : base(rootModuleType, services, optionAction)
+            options=null) : base(rootModuleType, services, options)
         {
             services.AddSingleton<IMountSpriteApplicationContext>(this);
         }

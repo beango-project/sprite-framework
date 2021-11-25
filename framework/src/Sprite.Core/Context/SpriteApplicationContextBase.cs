@@ -13,7 +13,7 @@ namespace Sprite.Context
         private readonly IModuleStore _moduleStore;
 
         public SpriteApplicationContextBase([NotNull] Type rootModuleType, [NotNull] IServiceCollection services, [CanBeNull] Action<SpriteApplicationCreateOptions>
-            optionsAction = null)
+            options = null)
         {
             Check.NotNull(rootModuleType, nameof(rootModuleType));
             Check.NotNull(services, nameof(services));
@@ -23,8 +23,8 @@ namespace Sprite.Context
             services.TryAddSwapSpace();
             services.TryAddInSwapSpace<IServiceProvider>();
 
-            var options = new SpriteApplicationCreateOptions(services);
-            optionsAction?.Invoke(options);
+            var defaultOptions = new SpriteApplicationCreateOptions(services);
+            options?.Invoke(defaultOptions);
 
             services.TryAddSingleton<ISpriteApplicationContext>(this);
 
