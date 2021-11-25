@@ -21,7 +21,7 @@
     //先创建如下所示的模块配置类和模块类
     
     //模块配置类
-    public class MyModuleConfig : ModuleConfigure
+    public class MyModuleConfig : ModuleConfig
     {
         public override void Configure()
         {   //导入需要使用的模块
@@ -69,8 +69,9 @@
     {
        public static void Main(string[] args)
         {
-            var appContext = new ConventionalSpriteApplicationContext(typeof(MyModule));//创建SpriteApp
-            appContext.Run();//运行
+            var appContext=SpriteApplication.Build<MyModule>() //构建 Sprite App
+            //var appContext = new ConventionalSpriteApplicationContext(typeof(MyModule)); //或使用此方法创建
+            appContext.Run(); //运行
             //可以使用 appContext.ServiceProvider属性的方法来获取注入的服务和组件
             var component1 = appContext.ServiceProvider.GetService<Component1>();
             
@@ -78,6 +79,6 @@
 
             var component2 = appContext.ServiceProvider.GetRequiredService<Component2>();
             
-            appContext.Shutdown();//停止
+            appContext.Shutdown(); //停止
         }
     }
