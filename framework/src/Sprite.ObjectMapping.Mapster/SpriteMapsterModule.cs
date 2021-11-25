@@ -1,9 +1,12 @@
 ﻿using System;
+using FastExpressionCompiler;
+using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Sprite.Modular;
+using Sprite.ObjectMapping.Mapster.Attributes;
 
 namespace Sprite.ObjectMapping.Mapster
 {
@@ -11,21 +14,48 @@ namespace Sprite.ObjectMapping.Mapster
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.Add(ServiceDescriptor.Describe(typeof(IObjectMapper), typeof(MapsterObjectMapper), ServiceLifetime.Singleton));
-            services.AddSingleton(CreateMapperAccessor);
-            services.AddSingleton<IMapperAccessor>(sp => sp.GetRequiredService<MapperAccessor>());
+
+            MapsterConfiguration();
+            
+            services.Add(ServiceDescriptor.Describe(typeof(IObjectMapper), typeof(MaptserObjectMapper), ServiceLifetime.Singleton));
+            services.AddSingleton(CreateMapper);
+            services.AddSingleton<IMapper>(sp => sp.GetRequiredService<Mapper>());
+            // services.AddSingleton<IMapperAccessor>(sp => sp.GetRequiredService<MapsterMapperAccessor>());
         }
 
-        private MapperAccessor CreateMapperAccessor(IServiceProvider serviceProvider)
+        private void MapsterConfiguration()
+        {
+            //FEC
+            TypeAdapterConfig.GlobalSettings.Compiler = expression => expression.CompileFast();
+            TypeAdapterConfig.GlobalSettings.Default.Config.CompileProjection();
+            TypeAdapterConfig.GlobalSettings.Default.IgnoreAttribute(typeof(NotMapAttribute));
+        }
+        
+        private Mapper CreateMapper(IServiceProvider serviceProvider)
         {
             using (var scope = serviceProvider.CreateScope())
             {
                 var options = scope.ServiceProvider.GetRequiredService<IOptions<MapsterOptions>>().Value;
-                return new MapperAccessor
-                {
-                    Mapper = new Mapper(options.Config)
-                };
+                
+                // Validate
+                options.GlobalSettings.Compile();
+                
+                return new Mapper();
             }
         }
+
+        // private MapsterMapperAccessor CreateMapperAccessor(IServiceProvider serviceProvider)
+        // {
+        //     using (var scope = serviceProvider.CreateScope())
+        //     {
+        //         var options = scope.ServiceProvider.GetRequiredService<IOptions<MapsterOptions>>().Value;
+        //         options.GlobalSettings.Compile();
+        //         return new MapsterMapperAccessor
+        //         {
+        //             
+        //             Mapper = new Mapper(options.GlobalSettings.Clone())
+        //         };
+        //     }
+        // }
     }
 }

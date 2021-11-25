@@ -52,6 +52,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprite.Core.Tests", "test\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "test\CommonTests\CommonTests.csproj", "{151050EB-7FDD-4E42-B72D-51D40DDE1C7F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprite.DependencyInjection.DryIoc.Tests", "test\Sprite.DependencyInjection.DryIoc.Tests\Sprite.DependencyInjection.DryIoc.Tests.csproj", "{91F3DEDB-58F8-4ED4-BEB0-06BFD310B069}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprite.ObjectMapping.Mapster.Tests", "test\Sprite.ObjectMapping.Mapster.Tests\Sprite.ObjectMapping.Mapster.Tests.csproj", "{FE3B2594-0C05-4254-9628-FD4A9CCC3EA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +86,8 @@ Global
 		{694E9CBA-9FBF-44C5-A686-C99B19A969FE} = {5CD43197-AFCA-4FEA-9740-0B87C7342209}
 		{75083AB4-9472-4D46-BD53-914CFCEB3379} = {F3DE9974-7F30-4081-A531-B425E0F21DF3}
 		{151050EB-7FDD-4E42-B72D-51D40DDE1C7F} = {F3DE9974-7F30-4081-A531-B425E0F21DF3}
+		{91F3DEDB-58F8-4ED4-BEB0-06BFD310B069} = {F3DE9974-7F30-4081-A531-B425E0F21DF3}
+		{FE3B2594-0C05-4254-9628-FD4A9CCC3EA3} = {F3DE9974-7F30-4081-A531-B425E0F21DF3}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{230472F8-4215-4A9B-AED7-D4E30BFF697E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -180,5 +186,13 @@ Global
 		{151050EB-7FDD-4E42-B72D-51D40DDE1C7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{151050EB-7FDD-4E42-B72D-51D40DDE1C7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{151050EB-7FDD-4E42-B72D-51D40DDE1C7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91F3DEDB-58F8-4ED4-BEB0-06BFD310B069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91F3DEDB-58F8-4ED4-BEB0-06BFD310B069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91F3DEDB-58F8-4ED4-BEB0-06BFD310B069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91F3DEDB-58F8-4ED4-BEB0-06BFD310B069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE3B2594-0C05-4254-9628-FD4A9CCC3EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE3B2594-0C05-4254-9628-FD4A9CCC3EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE3B2594-0C05-4254-9628-FD4A9CCC3EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE3B2594-0C05-4254-9628-FD4A9CCC3EA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

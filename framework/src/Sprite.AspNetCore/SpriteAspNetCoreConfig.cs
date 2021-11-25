@@ -3,7 +3,7 @@ using Sprite.Web;
 
 namespace Sprite.AspNetCore
 {
-    public class SpriteAspNetCoreConfigure : ModuleConfigure
+    public class SpriteAspNetCoreConfig : ModuleConfig
     {
         public override void Configure()
         {

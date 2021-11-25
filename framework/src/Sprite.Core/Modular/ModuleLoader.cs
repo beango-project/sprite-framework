@@ -90,7 +90,7 @@ namespace Sprite.Modular
             var findModuleConfigure = _scanner.FindModuleConfigure(moduleType);
             if (findModuleConfigure != null)
             {
-                var config = (ModuleConfigure) Activator.CreateInstance(findModuleConfigure);
+                var config = (ModuleConfig) Activator.CreateInstance(findModuleConfigure);
                 config.Configure();
                 return new ModuleDefinition(moduleType, module, config.SkipAutoScanRegister, processors);
             }

@@ -25,6 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddFromAssemblyOf<ISpriteApplicationContext>();
 
             services.Configure<InvocationOptions>(x => { x.Interceptors.Clear(); });
+            services.AddOptions<InterceptorOptions>();
         }
     }
 }

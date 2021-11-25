@@ -27,7 +27,7 @@ using Sprite.Security.Authorization;
 
 namespace Sprite.AspNetCore.Mvc
 {
-    [Usage(typeof(SpriteAspNetCoreMvcConfigure))]
+    [Usage(typeof(SpriteAspNetCoreMvcConfig))]
     public class SpriteAspNetCoreMvcModule : SpriteModule
     {
         public override void ConfigureServices(IServiceCollection services)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Sprite.DependencyInjection.Attributes;
 
 namespace Sprite.ObjectMapping
@@ -14,7 +15,27 @@ namespace Sprite.ObjectMapping
             throw new System.NotImplementedException();
         }
 
+        public TDestination Map<TSource, TDestination>(TSource source)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<TDestination> MapAsync<TDestination>(object source)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<TDestination> MapAsync<TSource, TDestination>(TSource source)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<TDestination> MapAsync<TSource, TDestination>(TSource source, TDestination destination)
         {
             throw new System.NotImplementedException();
         }

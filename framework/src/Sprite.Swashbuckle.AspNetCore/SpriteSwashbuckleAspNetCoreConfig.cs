@@ -6,7 +6,7 @@ namespace Sprite.Swashbuckle.AspNetCore
     /// <summary>
     /// Sprite swashbuckle AspNetCore module configure
     /// </summary>
-    public class SpriteSwashbuckleAspNetCoreConfigure : ModuleConfigure
+    public class SpriteSwashbuckleAspNetCoreConfig : ModuleConfig
     {
         /// <summary>
         /// configure import depends module

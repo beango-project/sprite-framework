@@ -2,7 +2,7 @@
 
 namespace Sprite.Data.EntityFrameworkCore
 {
-    public class SpriteEfCoreModuleConfigure : ModuleConfigure
+    public class SpriteEfCoreModuleConfig : ModuleConfig
     {
         public override void Configure()
         {

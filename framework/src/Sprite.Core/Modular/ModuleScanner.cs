@@ -20,7 +20,7 @@ namespace Sprite.Modular
             var configureType = FindModuleConfigure(tModuleType);
             if (configureType != null)
             {
-                var moduleConfigure = (ModuleConfigure) Activator.CreateInstance(configureType)!;
+                var moduleConfigure = (ModuleConfig)Activator.CreateInstance(configureType)!;
                 moduleConfigure.Configure(); //调用导入模块方法
                 foreach (var depended in moduleConfigure.DependedModules)
                 {
@@ -38,14 +38,8 @@ namespace Sprite.Modular
             var attribute = tModuleType.GetCustomAttribute<UsageAttribute>();
             if (attribute != null)
             {
-                // var moduleConfigure = tModuleType.Assembly.GetTypes()
-                //     .FirstOrDefault(x =>
-                //         x.IsClass &&
-                //         !x.IsAbstract &&
-                //         !x.IsGenericType &&
-                //         typeof(ModuleConfigure).IsAssignableFrom(x));
                 var moduleConfigure = attribute.ModuleConfigure;
-                if (moduleConfigure.IsClass && !moduleConfigure.IsAbstract && !moduleConfigure.IsGenericType && typeof(ModuleConfigure).IsAssignableFrom(moduleConfigure))
+                if (moduleConfigure.IsClass && !moduleConfigure.IsAbstract && !moduleConfigure.IsGenericType && typeof(ModuleConfig).IsAssignableFrom(moduleConfigure))
                 {
                     return moduleConfigure;
                 }

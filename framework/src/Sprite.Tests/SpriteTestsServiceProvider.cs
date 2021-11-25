@@ -6,7 +6,7 @@ namespace Sprite.Tests
 {
     public abstract class SpriteTestsServiceProvider
     {
-        protected abstract ServiceProvider ServiceProvider { get; }
+        protected abstract IServiceProvider ServiceProvider { get; }
 
         protected virtual T GetService<T>() => ServiceProvider.GetService<T>();
 
