@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using FastExpressionCompiler;
 using Mapster;
-using Sprite.ObjectMapping.Mapster.Attributes;
 
 namespace Sprite.ObjectMapping.Mapster
 {

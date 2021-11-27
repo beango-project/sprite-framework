@@ -1,6 +1,6 @@
 ﻿using System;
 using Mapster;
-using Sprite.ObjectMapping.Mapster.Attributes;
+using Sprite.ObjectMapping.Attributes;
 
 namespace Sprite.ObjectMapping.Mapster.Tests
 {
@@ -26,16 +26,17 @@ namespace Sprite.ObjectMapping.Mapster.Tests
         public DateTime Birthday { get; set; }
     }
 
+    
     public class FooDto2
     {
         public Guid Id { get; set; }
 
         public int Age { get; set; }
-
-        [NotMap]
+        
+        [MapIgnore]
         public string Name { get; set; }
 
-        [AdaptIgnore(MemberSide.Destination)]
+        [MapIgnore(Mapping.AsDestination)]
         public DateTime Birthday { get; set; }
     }
 

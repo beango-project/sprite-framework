@@ -74,18 +74,18 @@ namespace Sprite.ObjectMapping.Mapster.Tests
         {
             var id = Guid.NewGuid();
             var dateTime = DateTime.Now;
-            var fooDto = _objectMapper.Map<Foo, FooDto>(new Foo
-            {
-                Id = id,
-                Name = "foo1",
-                Age = 1,
-                Birthday = dateTime
-            });
-
-            fooDto.Id.ShouldBe(id);
-            fooDto.Name.ShouldBeNull(); // this item is set to ignore
-            fooDto.Age.ShouldBe(1);
-            fooDto.Birthday.ShouldBe(dateTime);
+            // var fooDto = _objectMapper.Map<Foo, FooDto>(new Foo
+            // {
+            //     Id = id,
+            //     Name = "foo1",
+            //     Age = 1,
+            //     Birthday = dateTime
+            // });
+            //
+            // fooDto.Id.ShouldBe(id);
+            // fooDto.Name.ShouldBeNull(); // this item is set to ignore
+            // fooDto.Age.ShouldBe(1);
+            // fooDto.Birthday.ShouldBe(dateTime);
 
             var fooDto2 = _objectMapper.Map<Foo, FooDto2>(new Foo
             {
