@@ -9,20 +9,11 @@ namespace Sprite.Data.Uow
 {
     public class UnitOfWorkManager : IUnitOfWorkManager, ISingletonInjection
     {
-        // public IUnitOfWork Current => _scopedUnitOfWorks?.LastOrDefault();
+        public IUnitOfWork? CurrentUow => GetUnitOfWork();
 
-
-        public IUnitOfWork? CurrentUow => AmbientUnitOfWork.Current.UnitOfWork;
-
-
-        // private readonly List<IUnitOfWork> _scopedUnitOfWorks;
-        //
-        // private readonly List<IUnitOfWork> _actualUnitOfWorks;
 
         public UnitOfWorkManager()
         {
-            // _scopedUnitOfWorks = new List<IUnitOfWork>();
-            // _actualUnitOfWorks = new List<IUnitOfWork>();
         }
 
         public IUnitOfWork Begin(TransactionOptions options = null)
@@ -60,6 +51,56 @@ namespace Sprite.Data.Uow
             }
         }
 
+        public IUnitOfWork Reserve(string reservationName)
+        {
+            Check.NotNullOrEmpty(reservationName, nameof(reservationName));
+
+            if (CurrentUow != null && CurrentUow.ReservationKey == reservationName)
+            {
+                //TODO Setting TransactionOptions
+                return new VirtualUnitOfWork(null, CurrentUow);
+            }
+
+            var outer = CurrentUow;
+            var uow = new UnitOfWork(reservationName);
+            uow.Outer = outer;
+            uow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.SetUnitOfWork(outer); };
+            AmbientUnitOfWork.Current.SetUnitOfWork(uow);
+
+            return uow;
+        }
+
+        public bool TryBeginReserved(string reservationKey, TransactionOptions options)
+        {
+            var uow = AmbientUnitOfWork.Current.UnitOfWork;
+            while (uow != null && !(uow.IsReserved && uow.ReservationKey == reservationKey))
+            {
+                uow = uow.Outer;
+            }
+
+            if (uow == null)
+            {
+                return false;
+            }
+
+            uow.Active(options);
+
+            return true;
+        }
+
+        private IUnitOfWork GetUnitOfWork()
+        {
+            var uow = AmbientUnitOfWork.Current.UnitOfWork;
+
+            //Skip reserved unit of work
+            while (uow != null && (uow.IsReserved || uow.IsDisposed || uow.IsCompleted))
+            {
+                uow = uow.Outer;
+            }
+
+            return uow;
+        }
+
         private IUnitOfWork FindOrBeginVirtualUnitOfWork(TransactionOptions options, bool isTransactional)
         {
             if (CurrentUow == null)
@@ -88,8 +129,8 @@ namespace Sprite.Data.Uow
                     var outer = CurrentUow;
                     var newUow = new VirtualUnitOfWork(options, virtualUow.BaseUow);
                     // newUow.Outer = outer;
-                    AmbientUnitOfWork.Current.AddUnitOfWork(newUow);
-                    newUow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.AddUnitOfWork(outer); };
+                    AmbientUnitOfWork.Current.SetUnitOfWork(newUow);
+                    newUow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.SetUnitOfWork(outer); };
                     return newUow;
                 }
             }
@@ -98,8 +139,8 @@ namespace Sprite.Data.Uow
                 var outer = CurrentUow;
                 var newUow = new VirtualUnitOfWork(options, outer);
                 // newUow.Outer = outer;
-                newUow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.AddUnitOfWork(outer); };
-                AmbientUnitOfWork.Current.AddUnitOfWork(newUow);
+                newUow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.SetUnitOfWork(outer); };
+                AmbientUnitOfWork.Current.SetUnitOfWork(newUow);
                 return newUow;
             }
             //
@@ -131,8 +172,8 @@ namespace Sprite.Data.Uow
             var outer = CurrentUow;
             var uow = new UnitOfWork(options);
             uow.Outer = outer;
-            uow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.AddUnitOfWork(outer); };
-            AmbientUnitOfWork.Current.AddUnitOfWork(uow);
+            uow.OnDisposed += (_, _) => { AmbientUnitOfWork.Current.SetUnitOfWork(outer); };
+            AmbientUnitOfWork.Current.SetUnitOfWork(uow);
             // uow.OnDisposed += (_, _) =>
             // {
             //     _actualUnitOfWorks.Remove(uow);

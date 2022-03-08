@@ -17,5 +17,7 @@ namespace Sprite.Modular
         IReadOnlySet<IModuleProcessor> Processors { get; }
 
         bool IsSkipAutoScanRegister { get; }
+
+        void RemoveProcessor(IModuleProcessor processor);
     }
 }

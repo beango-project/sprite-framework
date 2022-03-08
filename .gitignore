@@ -424,3 +424,7 @@ fabric.properties
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Sprite
+
+# Sprite internal files

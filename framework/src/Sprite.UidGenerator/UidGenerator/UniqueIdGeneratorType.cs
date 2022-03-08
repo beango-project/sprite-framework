@@ -11,12 +11,5 @@
         /// 有序
         /// </summary>
         Sequential,
-        
-        
-        /// <summary>
-        /// 分布式
-        /// </summary>
-        Distributed
-        
     }
 }

@@ -4,6 +4,16 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Authors>Sprite</Authors>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Grace" Version="7.2.1" />
+    </ItemGroup>
 
 </Project>

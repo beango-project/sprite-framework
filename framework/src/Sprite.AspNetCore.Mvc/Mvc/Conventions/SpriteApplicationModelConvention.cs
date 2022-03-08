@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ImmediateReflection;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
@@ -247,7 +248,7 @@ namespace Sprite.AspNetCore.Mvc.Conventions
                 return description.RootPath;
             }
 
-            var areaAttribute = controllerType.GetCustomAttributes().OfType<AreaAttribute>().FirstOrDefault();
+            var areaAttribute = controllerType.GetImmediateType().GetAllAttributes().OfType<AreaAttribute>().FirstOrDefault();
             if (areaAttribute?.RouteValue != null)
             {
                 return areaAttribute.RouteValue;

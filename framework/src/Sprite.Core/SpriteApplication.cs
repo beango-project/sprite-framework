@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Sprite.Context;
 using Sprite.Modular;
 
@@ -16,9 +17,12 @@ namespace Sprite
         // {
         //  
         // }
-
+        public IHostEnvironment Environment { get; }
+        
+        
         private SpriteApplication()
         {
+            
         }
 
 

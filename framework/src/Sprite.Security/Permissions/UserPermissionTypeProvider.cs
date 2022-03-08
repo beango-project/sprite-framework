@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using Sprite.Security.Identity;
 
 namespace Sprite.Security.Permissions
 {

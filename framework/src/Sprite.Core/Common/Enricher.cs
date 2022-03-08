@@ -2,7 +2,6 @@
 
 namespace Sprite.Common
 {
-#nullable enable
     public abstract class Enricher<TContext> : IEnricher<TContext>
     {
         private readonly string _propertyName;

@@ -81,7 +81,7 @@ namespace Sprite.Core.Tests.DependencyInjection
             var instance1 = new SingletonClassInject1();
             swapSpace.Add<SingletonClassInject1>();
             swapSpace.TryAdd<SingletonClassInject1>(instance1);
-            
+
             swapSpace.Get<SingletonClassInject1>().ShouldBeNull();
             swapSpace.Clear();
         }
@@ -159,6 +159,23 @@ namespace Sprite.Core.Tests.DependencyInjection
         {
             _services.AddFromTypeOf(typeof(SingletonClassWithAttributeInject));
             _services.ShouldBeSingleton(typeof(SingletonClassWithAttributeInject));
+        }
+
+
+        [Fact]
+        public void Resolver()
+        {
+            _services.AddFromTypeOf(typeof(SingletonClassInject1));
+            
+            var serviceProvider = _services.BuildServiceProvider();
+            var singletonClassInject1 = serviceProvider.GetRequiredService<SingletonClassInject1>();
+            var singletonClassInject2 = serviceProvider.GetRequiredService<SingletonClassInject1>();
+            // singletonClassInject1.Id.ShouldBe(serviceProvider.GetRequiredService<SingletonClassInject1>().Id);
+        }
+
+        class MyClass
+        {
+            public Guid Id { get; } = Guid.NewGuid();
         }
 
         public class TransientClassInject : ITransientInjection

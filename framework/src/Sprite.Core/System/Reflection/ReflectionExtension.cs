@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Reflection;
-using JetBrains.Annotations;
+using ImmediateReflection;
 
 #nullable enable
 namespace System.Reflection
@@ -41,13 +40,23 @@ namespace System.Reflection
         //     where TAttribute : Attribute
         //     => GetAttributeWithDefined<TAttribute>(type.mem, inherit);
 
-        [CanBeNull]
+
+        public static bool IsDefined<TAttribute>(this MemberInfo memberInfo, bool inherit = false)
+        {
+            return memberInfo.IsDefinedImmediateAttribute(typeof(TAttribute), inherit);
+        }
+
+        public static bool IsDefinedAttribute(this MemberInfo memberInfo, Type attributeType, bool inherit = false)
+        {
+            return memberInfo.IsDefinedImmediateAttribute(attributeType, inherit);
+        }
+
         public static TAttribute? GetAttributeWithDefined<TAttribute>(this MemberInfo memberInfo, bool inherit = true)
             where TAttribute : Attribute
         {
-            if (memberInfo.IsDefined(typeof(TAttribute), inherit))
+            if (memberInfo.IsDefinedImmediateAttribute(typeof(TAttribute), inherit))
             {
-                return memberInfo.GetCustomAttribute<TAttribute>();
+                return memberInfo.GetImmediateAttribute<TAttribute>(inherit);
             }
 
             return null;

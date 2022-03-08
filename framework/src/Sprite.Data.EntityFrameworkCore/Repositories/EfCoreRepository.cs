@@ -71,20 +71,40 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         public override async Task<List<TEntity>> GetListAsync(CancellationToken cancellationToken = default)
         {
-            return (await GetAllAsync(cancellationToken)).ToList();
+            return await (await GetDbSetAsync()).ToListAsync(cancellationToken);
         }
 
         public override async Task<List<TEntity>> GetListAsync(CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] propertySelectors)
         {
-            return (await GetAllAsync(cancellationToken, propertySelectors)).ToList();
+            IQueryable<TEntity> query = null;
+
+            if (propertySelectors != null)
+            {
+                foreach (var includeProperty in propertySelectors)
+                {
+                    if (query == null)
+                    {
+                        query = DbSet.IncludeOptimized(includeProperty);
+                        continue;
+                    }
+
+                    query = query.IncludeOptimized(includeProperty);
+                }
+            }
+            else
+            {
+                query = DbSet.AsQueryable();
+            }
+
+            return await query.ToListAsync(cancellationToken);
         }
 
         public override IQueryable<TEntity> GetAllMerge(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] propertySelectors)
         {
             var query = DbSet.Where(predicate);
 
-            var compileFast = predicate.CompileFast();
-            DbSet.Where(compileFast);
+            // var compileFast = predicate.CompileFast();
+            DbSet.Where(predicate);
             if (propertySelectors != null)
             {
                 foreach (var includeProperty in propertySelectors)
@@ -142,7 +162,9 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         public override async Task AddManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await DbSet.AddRangeAsync(entities, cancellationToken);
+            //TODO :修改改为追踪方式
+            await DbContext.AddRangeAsync(entities, cancellationToken);
+            // await DbSet.BulkInsertAsync(entities, cancellationToken);
 
             if (autoSave)
             {
@@ -175,12 +197,14 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
         public override async Task<int> UpdateAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TEntity>> expression, bool autoSave = false,
             CancellationToken cancellationToken = default)
         {
+            //TODO :修改改为追踪方式
             return await DbSet.Where(predicate).UpdateAsync(expression, cancellationToken: cancellationToken);
         }
 
 
         public override async Task UpdateManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
+            //TODO :修改改为追踪方式
             await DbContext.BulkUpdateAsync(entities, cancellationToken);
 
             if (autoSave)
@@ -191,7 +215,10 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         public override async Task DeleteAsync(TEntity entity, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await DbSet.SingleDeleteAsync(entity, cancellationToken);
+            //TODO :修改改为追踪方式
+            // await DbSet.SingleDeleteAsync(entity, cancellationToken);
+            // DbSet.Attach(entity);
+            DbContext.Set<TEntity>().Remove(entity);
             if (autoSave)
             {
                 await DbContext.SaveChangesAsync(cancellationToken);
@@ -200,13 +227,27 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         public override async Task<int> DeleteAsync(Expression<Func<TEntity, bool>> predicate, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            return await DbSet.Where(predicate).DeleteAsync(cancellationToken: cancellationToken);
+            var queryable = DbSet.Where(predicate);
+            DbSet.RemoveRange(queryable);
+            var res = queryable.DeferredCount().FutureValue();
+
+            if (autoSave)
+            {
+                var saveCount = await DbContext.SaveChangesAsync(cancellationToken);
+                return res == saveCount ? saveCount : 0;
+            }
+
+            return res;
         }
 
         public override async Task<int> DeleteManyAsync(Expression<Func<TEntity, bool>> predicate, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            var res = await DbSet.Where(predicate).DeleteAsync(cancellationToken);
-
+            //TODO :修改改为追踪方式
+            // var res = await DbSet.Where(predicate).DeleteAsync(cancellationToken);
+            var queryable = DbSet.Where(predicate);
+            DbSet.RemoveRange(queryable);
+            var res = queryable.DeferredCount().FutureValue();
+            
             if (autoSave)
             {
                 var saveCount = await DbContext.SaveChangesAsync(cancellationToken);
@@ -218,6 +259,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         public override async Task DeleteManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
+            //TODO :修改改为追踪方式
             await DbSet.BulkDeleteAsync(entities, cancellationToken);
 
             if (autoSave)
@@ -368,6 +410,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         public virtual async Task DeleteManyAsync(IEnumerable<TKey> ids, bool autoSave = false, CancellationToken cancellationToken = default)
         {
+            //TODO :修改改为追踪方式
             var res = await DbSet.Where(x => ids.Contains(x.Id)).DeleteAsync(cancellationToken);
             if (autoSave)
             {

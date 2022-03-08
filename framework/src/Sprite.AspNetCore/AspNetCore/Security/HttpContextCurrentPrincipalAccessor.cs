@@ -1,9 +1,12 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Sprite.DependencyInjection.Attributes;
 using Sprite.Security.Claims;
 
-namespace Sprite.AspNetCore.AspNetCore.Security
+namespace Sprite.AspNetCore.Security
 {
+    [Component(ServiceLifetime.Singleton)]
     public class HttpContextCurrentPrincipalAccessor : ThreadCurrentPrincipalAccessor
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

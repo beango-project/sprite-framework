@@ -11,16 +11,15 @@ namespace Sprite.Data.Uow
 {
     public class VirtualUnitOfWork : IUnitOfWork
     {
-        public void Dispose()
-        {
-            OnDisposed?.Invoke(this, null);
-        }
-
         public Guid Id => BaseUow.Id;
         public bool IsDisposed => BaseUow.IsDisposed;
+        public bool IsReserved => BaseUow.IsReserved;
         public bool IsCompleted => BaseUow.IsCompleted;
 
         public bool IsSupportTransaction => BaseUow.IsSupportTransaction;
+        public bool HasTransaction => BaseUow.HasTransaction;
+        public bool Activated => BaseUow.Activated;
+        public string ReservationKey => BaseUow.ReservationKey;
 
         public IUnitOfWork Outer
         {
@@ -40,6 +39,18 @@ namespace Sprite.Data.Uow
             BaseUow.OnCompleted += (sender, args) => { OnCompleted?.Invoke(sender, args); };
             // BaseUow.OnDisposed += (sender, args) => { OnDisposed?.Invoke(sender, args); };
         }
+
+
+        public void Active(TransactionOptions options = null)
+        {
+            BaseUow.Active(options);
+        }
+
+        public void SetOptions(TransactionOptions options)
+        {
+            BaseUow.SetOptions(options);
+        }
+
 
         public IVendor GetOrAddVendor(string key, IVendor vendor)
         {
@@ -99,5 +110,24 @@ namespace Sprite.Data.Uow
         public event EventHandler OnCompleted;
         public event EventHandler OnFailed;
         public event EventHandler OnDisposed;
+
+        public void Dispose()
+        {
+            OnDisposed?.Invoke(this, null);
+            Unsubscribe();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return new ValueTask(Task.Run(Dispose));
+        }
+
+        protected virtual void Unsubscribe()
+        {
+            foreach (var e in OnDisposed.GetInvocationList())
+            {
+                OnDisposed -= (EventHandler)e;
+            }
+        }
     }
 }

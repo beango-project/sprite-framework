@@ -13,7 +13,7 @@ namespace Sprite.Security.Permissions
 
         public PermissionOptions Options;
 
-        public Permission Get(string name)
+        public virtual Permission Get(string name)
         {
             if (!PermissionDefinitions.ContainsKey(name))
             {

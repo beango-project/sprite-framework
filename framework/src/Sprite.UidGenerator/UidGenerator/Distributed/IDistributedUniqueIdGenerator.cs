@@ -1,7 +1,15 @@
-﻿namespace Sprite.UidGenerator
+﻿using System;
+
+namespace Sprite.UidGenerator
 {
-    public interface IDistributedUniqueIdGenerator
+    public interface IDistributedUniqueIdGenerator<T>
     {
-        long NextId();
+        T NextId();
+
+        IUidProvider<T> UiProvider { get; }
+    }
+
+    public interface IDistributedUniqueIdGenerator : IDistributedUniqueIdGenerator<long>
+    {
     }
 }

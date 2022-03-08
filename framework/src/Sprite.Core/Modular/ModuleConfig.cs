@@ -6,13 +6,14 @@ namespace Sprite.Modular
     public abstract class ModuleConfig
     {
         protected internal bool SkipAutoScanRegister = false;
+        private Type[] _dependedModules;
 
         [NotNull]
-        public Type[] DependedModules { get; private set; }
+        public Type[] DependedModules => _dependedModules;
 
         protected void ImportModules(params Type[] dependedModules)
         {
-            DependedModules = dependedModules ?? new Type[0];
+            _dependedModules = dependedModules ?? Type.EmptyTypes;
         }
 
         public abstract void Configure();

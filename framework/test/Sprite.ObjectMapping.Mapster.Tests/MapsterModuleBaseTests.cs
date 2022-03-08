@@ -70,7 +70,7 @@ namespace Sprite.ObjectMapping.Mapster.Tests
 
         
         [Fact]
-        public void Should_Map_Objects_With_Custom_Config()
+        public void  Should_Map_Objects_With_Custom_Config()
         {
             var id = Guid.NewGuid();
             var dateTime = DateTime.Now;

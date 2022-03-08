@@ -5,17 +5,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Castle.Core" Version="4.4.1"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0"/>
-        <PackageReference Include="Stashbox" Version="3.6.4"/>
+        <PackageReference Include="Castle.Core" Version="4.4.1" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Stashbox" Version="4.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj"/>
+        <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Dog.cs"/>
+        <Compile Remove="Dog.cs" />
     </ItemGroup>
 
 </Project>

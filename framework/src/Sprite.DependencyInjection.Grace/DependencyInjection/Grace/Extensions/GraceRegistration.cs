@@ -18,7 +18,7 @@ namespace Grace.DependencyInjection.Extensions
         /// </summary>
         /// <param name="exportLocator">export locator</param>
         /// <param name="descriptors">descriptors</param>
-        public static IServiceProvider Populate(this IInjectionScope exportLocator,
+        public static void Populate(this IInjectionScope exportLocator,
             IEnumerable<ServiceDescriptor> descriptors)
         {
             exportLocator.Configure(c =>
@@ -29,7 +29,7 @@ namespace Grace.DependencyInjection.Extensions
                 Register(c, descriptors);
             });
 
-            return exportLocator.Locate<IServiceProvider>();
+            // return exportLocator.Locate<IServiceProvider>();
         }
 
         private static void Register(IExportRegistrationBlock c, IEnumerable<ServiceDescriptor> descriptors)

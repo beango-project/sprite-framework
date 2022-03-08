@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,7 @@ namespace Sprite.AspNetCore.Mvc.Conventions
                 }
                 else
                 {
-                    if (!controllerType.IsDefined(typeof(ApiVersionAttribute), true))
+                    if (!controllerType.IsDefinedAttribute(typeof(ApiVersionAttribute), true))
                     {
                         controllerBuilder.IsApiVersionNeutral();
                     }

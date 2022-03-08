@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Authors>Sprite</Authors>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
+using ImTools;
 using Sprite.UidGenerator;
 
 namespace Sprite.Data.EntityFrameworkCore.Extensions
@@ -8,9 +11,14 @@ namespace Sprite.Data.EntityFrameworkCore.Extensions
     /// </summary>
     public class DbContextUidGeneratorOptions
     {
-        public bool IsDistributed { get; private set; }
-
+         public bool Enable { get; set; }
+         
         protected internal Type UidGeneratorType { get; private set; }
+
+        /// <summary>
+        /// 使用类型，生成器类型，是否跳过
+        /// </summary>
+        private SortedDictionary<Type, List<KeyValuePair<Type, bool>>> TypeAndUiGenerator { get; }
 
         /// <summary>
         /// 使用Uid生成器
@@ -19,17 +27,24 @@ namespace Sprite.Data.EntityFrameworkCore.Extensions
         public void UseUidGenerator<TUidGenerator>() where TUidGenerator : IUniqueIdGenerator
         {
             UidGeneratorType = typeof(TUidGenerator);
-            IsDistributed = false;
         }
 
         /// <summary>
         /// 使用分布式Uid生成器
         /// </summary>
         /// <typeparam name="TUidGenerator"></typeparam>
-        public void UseDistributedUidGenerator<TUidGenerator>() where TUidGenerator : IDistributedUniqueIdGenerator
+        public void UseDistributedUidGenerator<TUidGenerator>(bool ignore = false) where TUidGenerator : IDistributedUniqueIdGenerator
         {
             UidGeneratorType = typeof(TUidGenerator);
-            IsDistributed = true;
+        }
+
+        /// <summary>
+        /// 使用分布式Uid生成器
+        /// </summary>
+        /// <typeparam name="TUidGenerator"></typeparam>
+        public void UseDistributedUidGenerator<TUidGenerator, T>() where TUidGenerator : IDistributedUniqueIdGenerator<T>
+        {
+            UidGeneratorType = typeof(TUidGenerator);
         }
     }
 }

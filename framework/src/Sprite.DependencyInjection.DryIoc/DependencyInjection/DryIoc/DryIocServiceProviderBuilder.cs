@@ -15,7 +15,7 @@ namespace Sprite.DependencyInjection.DryIoc
         public static IContainer Build()
         {
             IContainer container =
-                new Container(Rules.MicrosoftDependencyInjectionRules.WithAutoConcreteTypeResolution().With(propertiesAndFields: _getImportedPropertiesAndFields));
+                new Container(Rules.MicrosoftDependencyInjectionRules.With(propertiesAndFields: _getImportedPropertiesAndFields).WithDynamicRegistrationsAsFallback(Rules.ConcreteTypeDynamicRegistrations()));
             return container;
         }
 
@@ -27,7 +27,7 @@ namespace Sprite.DependencyInjection.DryIoc
             {
                 return null;
             }
-
+            Console.WriteLine(member.ToString());
             var importedPropertiesAndFieldsOnly = PropertyOrFieldServiceInfo.Of(member);
 
             if (attribute.Type != null)

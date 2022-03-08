@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -21,12 +21,11 @@ namespace Sprite.Data.Uow
 
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        private delegate object Handler(Func<object[], object> target, object[] args);
+        private delegate object Handler(Func<object[], object> target, object[] args, IUnitOfWork unitOfWork);
 
         public UnitOfWorkAspect(IUnitOfWorkManager unitOfWorkManager)
         {
             _unitOfWorkManager = unitOfWorkManager;
-            
         }
 
         [Advice(Kind.Around, Targets = Target.Method)]
@@ -48,9 +47,19 @@ namespace Sprite.Data.Uow
                 Timeout = transactional.Timeout
             };
 
-            _unitOfWorkManager.Begin(options);
+            IUnitOfWork unitOfWork = null;
+            if (_unitOfWorkManager.TryBeginReserved("ReservedUow", options))
+            {
+                unitOfWork = _unitOfWorkManager.CurrentUow;
+            }
+            else
+            {
+                unitOfWork = _unitOfWorkManager.Begin(options);
+            }
+            // var unitOfWork = _unitOfWorkManager.Begin(options);
+
             var methodHandler = GetMethodHandler(method, returnType);
-            return methodHandler(target, args);
+            return methodHandler(target, args, unitOfWork);
         }
 
 
@@ -100,14 +109,21 @@ namespace Sprite.Data.Uow
 
             var argsParam = Expression.Parameter(typeof(object[]), "args");
             // var optionsParam = Expression.Parameter(typeof(object[]), "options");
-            next = Expression.Lambda(Expression.Call(null, wrapperMethod, next, argsParam), argsParam);
+
+            var uowArgs = Expression.Parameter(typeof(IUnitOfWork), "unitOfWork");
+
+            next = Expression.Lambda(Expression.Call(null, wrapperMethod, next, argsParam, uowArgs), argsParam, uowArgs);
             var orig_args = Expression.Parameter(typeof(object[]), "orig_args");
-            var handler = Expression.Lambda<Handler>(Expression.Convert(Expression.Invoke(next, orig_args), typeof(object)), targetParam, orig_args);
+
+
+            var handler = Expression.Lambda<Handler>(Expression.Convert(Expression.Invoke(next, orig_args), typeof(object)), targetParam, orig_args, uowArgs);
 
             var handlerCompiled = handler.CompileFast();
 
             return handlerCompiled;
         }
+
+        #region Obsolete code
 
         //
         // [Advice(Kind.Around, Targets = Target.Method)]
@@ -260,44 +276,67 @@ namespace Sprite.Data.Uow
         //     return res;
         // }
 
-        public static T Handle<T>(Func<object[], T> target, object[] args)
+        #endregion
+
+
+        public static T Handle<T>(Func<object[], T> target, object[] args, IUnitOfWork unitOfWork)
         {
             try
             {
                 var result = target(args);
-                AmbientUnitOfWork.Current.UnitOfWork?.Completed();
+                // AmbientUnitOfWork.Current.UnitOfWork?.Completed();
+                if (!unitOfWork.IsCompleted)
+                {
+                    unitOfWork.Completed();
+                }
+
                 return result;
             }
             catch (TargetInvocationException exception)
             {
-                AmbientUnitOfWork.Current.UnitOfWork?.Rollback();
+                // AmbientUnitOfWork.Current.UnitOfWork?.Rollback();
+                unitOfWork.Rollback();
                 throw exception;
             }
             finally
             {
-                AmbientUnitOfWork.Current.UnitOfWork?.Dispose();
+                // AmbientUnitOfWork.Current.UnitOfWork?.Dispose();
+                unitOfWork.Dispose();
             }
         }
 
-        public static async Task<T> HandleAsync<T>(Func<object[], Task<T>> target, object[] args)
+        public static async Task<T> HandleAsync<T>(Func<object[], Task<T>> target, object[] args, IUnitOfWork unitOfWork)
         {
             // T result = default(T);
             try
             {
                 var result = await target(args).ConfigureAwait(false);
                 // Console.WriteLine($"Async method `{name}` completes successfuly.");
-                await AmbientUnitOfWork.Current.UnitOfWork?.CompletedAsync();
+                // await AmbientUnitOfWork.Current.UnitOfWork?.CompletedAsync();
+                if (!unitOfWork.IsCompleted)
+                {
+                    await unitOfWork.CompletedAsync();
+                }
+
                 return result;
             }
             catch (TargetInvocationException exception)
             {
                 // Console.WriteLine($"Async method `{name}` throws {ex.GetType()} exception.");
-                await AmbientUnitOfWork.Current.UnitOfWork?.RollbackAsync();
+                // await AmbientUnitOfWork.Current.UnitOfWork?.RollbackAsync();
+                await unitOfWork.RollbackAsync();
                 throw exception;
             }
             finally
             {
-                AmbientUnitOfWork.Current.UnitOfWork?.Dispose();
+                // AmbientUnitOfWork.Current.UnitOfWork?.Dispose();
+                if (unitOfWork is UnitOfWork && unitOfWork.ReservationKey == "ReservedUow")
+                {
+                }
+                else
+                {
+                    await unitOfWork.DisposeAsync();
+                }
             }
         }
     }

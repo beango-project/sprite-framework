@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sprite.UidGenerator;
 using Sprite.UidGenerator.Providers;
 
@@ -29,7 +30,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var distributedUniqueIdGeneratorOptions = new DistributedUniqueIdGeneratorOptions(services);
             options?.Invoke(distributedUniqueIdGeneratorOptions);
-            services.PostConfigure<UniqueIdGeneratorOptions>(options => { options.IsDistributed = true; });
             services.Configure(options);
         }
     }

@@ -1,7 +1,9 @@
-﻿namespace Sprite.Data.Entities.Auditing
+﻿using System;
+
+namespace Sprite.Data.Entities.Auditing
 {
-    public class DeleteByAttribute
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class DeleteByAttribute : Attribute
     {
-        
     }
 }

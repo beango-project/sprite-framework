@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Sprite.Context;
 using Sprite.DependencyInjection;
 
-namespace Sprite.AspNetCore.AspNetCore.Builder
+namespace Sprite.AspNetCore.Builder
 {
     public static class SpriteApplicationBuilderExtensions
     {
@@ -24,8 +24,7 @@ namespace Sprite.AspNetCore.AspNetCore.Builder
             applicationLifetime.ApplicationStopped.Register(() => { context.Dispose(); });
 
             context.Run(app.ApplicationServices);
-
-            //TODO: Remove ServiceProvider object from swap, move in  Run()?
+            
             swapSpace.Remove<IApplicationBuilder>();
         }
     }

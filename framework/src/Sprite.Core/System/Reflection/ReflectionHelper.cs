@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using FastExpressionCompiler;
+using ImmediateReflection;
 
 namespace System.Reflection
 {
@@ -38,7 +39,7 @@ namespace System.Reflection
         public static IEnumerable<TAttribute> GetAttributesOfMemberInfo<TAttribute>(MemberInfo memberInfo, bool includeDeclaringType = true, bool inherit = true)
             where TAttribute : Attribute
         {
-            var customAttributes = memberInfo.GetCustomAttributes(inherit).OfType<TAttribute>();
+            var customAttributes = memberInfo.GetAllImmediateAttributes(inherit).OfType<TAttribute>();
             IEnumerable<TAttribute> declaringTypeCustomAttributes = null;
             if (includeDeclaringType)
             {
@@ -54,9 +55,9 @@ namespace System.Reflection
             where TAttribute : Attribute
         {
             var attributeType = typeof(TAttribute);
-            if (info.IsDefined(attributeType, true))
+            if (info.IsDefinedAttribute(attributeType, true))
             {
-                return info.GetCustomAttributes(attributeType, true).Cast<TAttribute>().First();
+                return info.GetImmediateAttributes(attributeType, true).Cast<TAttribute>().First();
             }
 
             foreach (var implInter in info.ImplementedInterfaces)

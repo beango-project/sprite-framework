@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Data;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,71 +9,93 @@ using Sprite.Data.Persistence;
 
 namespace Sprite.Data.Ado
 {
-    public class Ado<TDbConnection> : IVendor, ISupportPersistent, ISupportTransaction
+    public class Ado<TDbConnection> : IVendor, ISupportTransaction
         where TDbConnection : DbConnection
     {
-        [CanBeNull]
-        private readonly DbTransaction _transaction;
+        private readonly ConcurrentStack<DbTransaction> _txStack;
+        private readonly ConcurrentStack<DbCommand> _commands;
 
         public Ado(TDbConnection dbConnection)
         {
+            _txStack = new ConcurrentStack<DbTransaction>();
+            _commands = new ConcurrentStack<DbCommand>();
             DbConnection = dbConnection;
-            DbCommand = DbConnection.CreateCommand();
-            _transaction = DbCommand.Transaction;
         }
 
         // protected TDbConnection DbConnection { get; }
-        public DbCommand DbCommand { get; }
 
-        public int SaveChanges()
+
+        public DbCommand CreateCommand()
         {
-            var res = DbCommand.ExecuteNonQuery();
-            // _transaction?.Commit();
-            return res;
+            var command = DbConnection.CreateCommand();
+            _commands.Push(command);
+            return command;
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
 
-        public DbTransaction? CurrentTransaction { get; }
+        public DbTransaction? CurrentTransaction => GetCurrentTransaction();
+
+
+        protected DbTransaction? GetCurrentTransaction()
+        {
+            _txStack.TryPeek(out var transaction);
+            return transaction ?? null;
+        }
 
         public DbTransaction BeginTransaction()
         {
-            throw new NotImplementedException();
+            var transaction = DbConnection.BeginTransaction();
+            _txStack.Push(transaction);
+            return transaction;
         }
 
         public void UseTransaction(DbTransaction transaction)
         {
-            DbCommand.Transaction = transaction;
+            _commands.TryPeek(out var dbCommand);
+            dbCommand.Transaction = transaction;
         }
 
         public void Commit()
         {
-            _transaction?.Commit();
+            using (var enumerator = _commands.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current.Connection?.State != ConnectionState.Closed || enumerator.Current.Connection?.State != ConnectionState.Broken)
+                    {
+                        enumerator.Current.Transaction.Commit();
+                        enumerator.Current.Transaction.Dispose();
+                    }
+                }
+            }
         }
 
-        public Task CommitAsync(CancellationToken cancellationToken)
+        public async Task CommitAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            // await CurrentTransaction?.CommitAsync(cancellationToken);
         }
 
         public void Rollback()
         {
-            _transaction.Rollback();
+            CurrentTransaction?.Rollback();
         }
 
-        public Task RollbackAsync(CancellationToken cancellationToken)
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await CurrentTransaction?.RollbackAsync(cancellationToken);
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _txStack.Clear();
+            _commands.Clear();
         }
 
         public DbConnection DbConnection { get; }
+
+        public ValueTask DisposeAsync()
+        {
+            return new ValueTask(Task.Run(Dispose));
+        }
     }
 }

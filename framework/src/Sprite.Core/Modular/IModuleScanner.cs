@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Sprite.Modular
 {
@@ -21,5 +22,13 @@ namespace Sprite.Modular
         /// <param name="tModuleType"></param>
         /// <returns></returns>
         List<Type> FindModuleDepends(Type tModuleType);
+
+        /// <summary>
+        /// 查找模块配置
+        /// </summary>
+        /// <param name="tModuleType"></param>
+        /// <returns></returns>
+        [CanBeNull]
+        ModuleConfig FindModuleConfig(Type tModuleType);
     }
 }

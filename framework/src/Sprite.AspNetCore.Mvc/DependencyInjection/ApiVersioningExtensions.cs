@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -57,7 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 }
                 else
                 {
-                    if (!controllerType.IsDefined(typeof(ApiVersionAttribute), true))
+                    if (!controllerType.IsDefinedAttribute(typeof(ApiVersionAttribute), true))
                     {
                         controllerBuilder.IsApiVersionNeutral();
                     }

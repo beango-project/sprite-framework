@@ -20,7 +20,7 @@ namespace Sprite.Data.Uow
             get
             {
                 var current = _unitOfWorkCell.Value;
-                while (current?.IsDisposed == true) //if current uow is disposed we change current uow to outer(previous) 
+                while (current?.IsDisposed == true || current?.IsCompleted == true) //if current uow is disposed we change current uow to outer(previous) 
                 {
                     _unitOfWorkCell.Value = current = current.Outer;
                 }
@@ -54,7 +54,7 @@ namespace Sprite.Data.Uow
             }
         }
 
-        public void AddUnitOfWork(IUnitOfWork unitOfWork)
+        public void SetUnitOfWork(IUnitOfWork unitOfWork)
         {
             _unitOfWorkCell.Value = unitOfWork;
             // if (_unitOfWorkCell.Value == null)

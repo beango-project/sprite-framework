@@ -7,8 +7,7 @@ namespace Sprite.Data
     [AttributeUsage(AttributeTargets.Class)]
     public class ConnectionStringAttribute : Attribute
     {
-        [NotNull]
-        public string Name { get; }
+        [NotNull] public string Name { get; }
 
         public ConnectionStringAttribute([NotNull] string name)
         {
@@ -26,7 +25,7 @@ namespace Sprite.Data
         [CanBeNull]
         public static string GetConnectionStringName(Type type)
         {
-            var connectionStringAttribute = type.GetTypeInfo().GetCustomAttribute<ConnectionStringAttribute>();
+            var connectionStringAttribute = type.GetTypeInfo().GetAttributeWithDefined<ConnectionStringAttribute>();
             if (connectionStringAttribute == null)
             {
                 return null;

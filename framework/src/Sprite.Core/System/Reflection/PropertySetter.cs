@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using FastExpressionCompiler.LightExpression;
+﻿// System.Linq.Expressions;
 
-// System.Linq.Expressions;
 
+using AspectCore.Extensions.Reflection;
 
 namespace System.Reflection
 {
@@ -14,37 +13,48 @@ namespace System.Reflection
     {
         public PropertySetter(object target, T tValue, PropertyInfo propertyInfo)
         {
-            var methodInfo = propertyInfo.GetSetMethod() ?? propertyInfo.GetSetMethod(true);
-            var action = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), target, methodInfo);
-            action.Invoke(tValue);
+            propertyInfo.GetReflector().SetValue(target, tValue);
         }
+
+        #region Outdated method
+
+        // Replace with a better-performing method
+
+        // public PropertySetter(object target, T tValue, PropertyInfo propertyInfo)
+        // {
+        //     var methodInfo = propertyInfo.GetSetMethod() ?? propertyInfo.GetSetMethod(true);
+        //     var action = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), target, methodInfo);
+        //     action.Invoke(tValue);
+        // }
+
+        #endregion
     }
 
 
-    public class PropertySetterWithExpression
-    {
-        private static Dictionary<string, Action<object, object>> _imHashMap = new Dictionary<string, Action<object, object>>();
-
-
-        public PropertySetterWithExpression(object target, object value, PropertyInfo propertyInfo)
-        {
-            var cacheName = target.GetType().FullName + value.GetType().FullName + propertyInfo.Name;
-            if (!_imHashMap.TryGetValue(cacheName, out var callFunc))
-            {
-                var setAction = callFunc = CreateSetAction(propertyInfo);
-                _imHashMap.TryAdd(cacheName, setAction);
-            }
-
-            callFunc.Invoke(target, value);
-        }
-
-        private Action<object, object> CreateSetAction(PropertyInfo propertyInfo)
-        {
-            var methodInfo = propertyInfo.GetSetMethod() ?? propertyInfo.GetSetMethod(true);
-            var target = Expression.Parameter(typeof(object), "target");
-            var propValue = Expression.Parameter(typeof(object), "value");
-            var setCall = Expression.Call(target, methodInfo, propValue);
-            return Expression.Lambda<Action<object, object>>(setCall, target, propValue).CompileFast();
-        }
-    }
+    // public class PropertySetterWithExpression
+    // {
+    //     private static ImHashMap<string, Action<object, object>> _imHashMap = ImHashMap<string, Action<object, object>>.Empty;
+    //
+    //
+    //     public PropertySetterWithExpression(object target, object value, PropertyInfo propertyInfo)
+    //     {
+    //         var cacheName = target.GetType().FullName + value.GetType().FullName + propertyInfo.Name;
+    //         if (!_imHashMap.TryFind(cacheName, out var callFunc))
+    //         {
+    //             var setAction = callFunc = CreateSetAction(propertyInfo);
+    //             _imHashMap = _imHashMap.AddOrUpdate(cacheName, setAction);
+    //         }
+    //
+    //         callFunc.Invoke(target, value);
+    //     }
+    //
+    //     private Action<object, object> CreateSetAction(PropertyInfo propertyInfo)
+    //     {
+    //         var methodInfo = propertyInfo.GetSetMethod() ?? propertyInfo.GetSetMethod(true);
+    //         var target = Expression.Parameter(typeof(object), "target");
+    //         var propValue = Expression.Parameter(typeof(object), "value");
+    //         var setCall = Expression.Call(target, methodInfo, propValue);
+    //         return Expression.Lambda<Action<object, object>>(setCall, target, propValue).CompileFast();
+    //     }
+    // }
 }

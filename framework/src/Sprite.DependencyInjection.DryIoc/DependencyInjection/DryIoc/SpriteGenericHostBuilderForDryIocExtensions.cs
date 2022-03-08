@@ -12,8 +12,9 @@ namespace Sprite.DependencyInjection.DryIoc
     {
         public static IHostBuilder UseSpriteServiceProviderFactory(this IHostBuilder hostBuilder)
         {
-            var container = DryIocServiceProviderBuilder.Build();
-            return hostBuilder.UseServiceProviderFactory(new DryIocServiceProviderFactory(container));
+            var adapter = new DryIocServiceProviderAdapter();
+            adapter.Initialization();
+            return hostBuilder.UseServiceProviderFactory(adapter.CreateServiceProviderFactory());
         }
     }
 }

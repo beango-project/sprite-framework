@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ImmediateReflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Sprite.Modular
@@ -9,7 +10,7 @@ namespace Sprite.Modular
     {
         private readonly Type _rootModuleType;
 
-        private readonly ModuleScanner _scanner;
+        private readonly IModuleScanner _scanner;
         private readonly IServiceCollection _services;
 
         public ModuleLoader(IServiceCollection services, Type rootModuleType)
@@ -20,8 +21,17 @@ namespace Sprite.Modular
             _scanner = new ModuleScanner();
         }
 
+        public ModuleLoader(IServiceCollection services, Type rootModuleType, IModuleScanner moduleScanner)
+        {
+            Check.NotNull(services, nameof(services));
+            _services = services;
+            _rootModuleType = rootModuleType;
+            _scanner = moduleScanner;
+        }
+
         public List<IModuleDefinition> LoadModules()
         {
+            // logger.LogInformation("开始加载模块和定义");
             var moduleDefinitions = LoadModuleDefinitions();
             moduleDefinitions = SortImportModuleSetDependency(moduleDefinitions, _rootModuleType);
             ConfigureModuleServices(moduleDefinitions);
@@ -37,7 +47,7 @@ namespace Sprite.Modular
                 {
                     //TODO We can extract ConfigureServicesProcessors ?
                     var configureServicesProcessors = moduleDefinition.Processors.AsParallel().OfType<IConfigureServicesProcessor>().OrderBy(x => x.Order);
-                    
+
                     if (!moduleDefinition.IsSkipAutoScanRegister)
                     {
                         _services.AddFromAssemblyOf(moduleDefinition.Module.Assembly);
@@ -47,12 +57,14 @@ namespace Sprite.Modular
                     {
                         configureServicesProcessor.BeforeConfigureServices(_services);
                     }
-                    
+
                     moduleDefinition.ModuleInstance.ConfigureServices(_services);
 
                     foreach (var configureServicesProcessor in configureServicesProcessors)
                     {
                         configureServicesProcessor.AfterConfigureServices(_services);
+                        // TODO:We can remove the used Processor to reduce memory usage?
+                        // moduleDefinition.RemoveProcessor(configureServicesProcessor);
                     }
                 }
             }
@@ -87,12 +99,10 @@ namespace Sprite.Modular
         {
             var module = CreateAndAddInServicesModule(moduleType);
             var processors = LoadModuleProcessors(moduleType);
-            var findModuleConfigure = _scanner.FindModuleConfigure(moduleType);
-            if (findModuleConfigure != null)
+            var moduleConfig = _scanner.FindModuleConfig(moduleType);
+            if (moduleConfig != null)
             {
-                var config = (ModuleConfig) Activator.CreateInstance(findModuleConfigure);
-                config.Configure();
-                return new ModuleDefinition(moduleType, module, config.SkipAutoScanRegister, processors);
+                return new ModuleDefinition(moduleType, module, moduleConfig.SkipAutoScanRegister, processors);
             }
 
             return new ModuleDefinition(moduleType, module, processors: processors);
@@ -101,9 +111,13 @@ namespace Sprite.Modular
 
         private ISpriteModule CreateAndAddInServicesModule(Type moduleType)
         {
-            var module = (ISpriteModule) Activator.CreateInstance(moduleType)!;
-            _services.AddSingleton(moduleType, module);
-            return module;
+            if (TypeAccessor.Get(moduleType).TryNew(out var module, out var exception))
+            {
+                _services.AddSingleton(moduleType, (ISpriteModule)module);
+                return (ISpriteModule)module;
+            }
+
+            throw exception;
         }
 
         /// <summary>
@@ -118,7 +132,7 @@ namespace Sprite.Modular
             var processorSet = new HashSet<IModuleProcessor>();
             foreach (var processor in processorsList)
             {
-                var instance = (IModuleProcessor) Activator.CreateInstance(processor);
+                var instance = (IModuleProcessor)processor.New();
                 processorSet.Add(instance);
             }
 

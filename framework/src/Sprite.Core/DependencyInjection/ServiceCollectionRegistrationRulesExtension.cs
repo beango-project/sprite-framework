@@ -40,10 +40,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var effectiveRegistrationRules = services.GetEffectiveRegistrationRules();
 
-            foreach (var rules in effectiveRegistrationRules.RulesCollection)
-            {
-                rules.AddFromAssemblyOf(services, assembly);
-            }
+            effectiveRegistrationRules.RulesCollection.AsParallel().ForAll(rules => rules.AddFromAssemblyOf(services, assembly));
+
+            // foreach (var rules in effectiveRegistrationRules.RulesCollection)
+            // {
+            //     rules.AddFromAssemblyOf(services, assembly);
+            // }
 
             return services;
         }
@@ -51,10 +53,13 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddFromTypeOf(this IServiceCollection services, Type type)
         {
             var effectiveRegistrationRules = services.GetEffectiveRegistrationRules();
-            foreach (var rules in effectiveRegistrationRules.RulesCollection)
-            {
-                rules.AddFromTypeOf(services, type);
-            }
+
+            effectiveRegistrationRules.RulesCollection.AsParallel().ForAll(rules => rules.AddFromTypeOf(services, type));
+
+            // foreach (var rules in effectiveRegistrationRules.RulesCollection)
+            // {
+            //     rules.AddFromTypeOf(services, type);
+            // }
 
             return services;
         }

@@ -7,7 +7,7 @@ namespace Sprite.Data.Entities.Auditing
         where TUserKey : IEquatable<TUserKey>
     {
         [LastModifiedDate]
-        public virtual DateTime ModifiedTime { get; protected set; }
+        public virtual DateTime? ModifiedTime { get; protected set; }
 
         [LastModifiedBy]
         public virtual TUserKey LastModifierId { get; protected set; }

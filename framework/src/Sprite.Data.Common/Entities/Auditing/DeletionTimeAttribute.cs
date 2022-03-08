@@ -3,7 +3,7 @@
 namespace Sprite.Data.Entities.Auditing
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
-    public class DeleteTimeAttribute: Attribute
+    public class DeletionTimeAttribute: Attribute
     {
         
     }

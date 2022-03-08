@@ -95,22 +95,23 @@ namespace Sprite.AspNetCore.Mvc
             var mvcCoreBuilder = services.AddMvcCore(options =>
             {
                 options.Filters.Add<SpriteAutoValidateAntiForgeryTokenAttribute>();
-                options.Filters.AddService<UnitOfWorkActionFilter>();
-                options.Filters.AddService(typeof(SpriteResultFilter));
-                options.Filters.AddService(typeof(SpriteExceptionFilter));
+                options.Filters.Add<UnitOfWorkActionFilter>();
+                options.Filters.Add<SpriteResultFilter>();
+                options.Filters.Add<UowDelayedDisposeFilter>();
+                // options.Filters.AddService(typeof(SpriteExceptionFilter));
             });
 
             services.TryAddTransient<AutoValidateAntiforgeryTokenAttribute>();
 
             // Use DI create mvc services 
-            var mvcBuilder = services.AddMvc().AddRazorRuntimeCompilation();
+            var mvcBuilder = services.AddControllersWithViews();
             //Use DI to create controllers
             services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
-
-            //Use DI to create view components
+            //
+            // //Use DI to create view components
             services.Replace(ServiceDescriptor.Singleton<IViewComponentActivator, ServiceBasedViewComponentActivator>());
-
-            //Use DI to create razor page
+            //
+            // //Use DI to create razor page
             services.Replace(ServiceDescriptor.Singleton<IPageModelActivatorProvider, ServiceBasedPageModelActivatorProvider>());
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();

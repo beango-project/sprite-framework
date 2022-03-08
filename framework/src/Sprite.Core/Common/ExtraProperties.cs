@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ImTools;
 
-namespace Sprite.Data.Entities
+namespace Sprite.Common
 {
     public class ExtraProperties : Dictionary<string, object>
     {

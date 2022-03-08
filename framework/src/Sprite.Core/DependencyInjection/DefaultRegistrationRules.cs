@@ -26,9 +26,7 @@ namespace Sprite.DependencyInjection
 
             var exportServiceTypes = GetExportServiceTypes(type);
 
-            // if (exportServiceTypes.Any(x => x == typeof(NullObjectMapper)))
-            // {
-            // }
+            // TriggerServiceExposing(services, type, exportServiceTypes);
 
             foreach (var exportServiceType in exportServiceTypes)
             {
@@ -49,43 +47,9 @@ namespace Sprite.DependencyInjection
                 }
                 else
                 {
-                    // if (serviceLifetime.Value.IsIn(ServiceLifetime.Singleton,ServiceLifetime.Scoped))
-                    // {
-                    //    services.TryAdd(serviceDescriptor);
-                    // }
-                    // else
-                    // {
                     services.Add(serviceDescriptor);
-                    // }
                 }
             }
-            // exportServiceTypes.ForEach(exportServiceType =>
-            // {
-            //  
-            // });
-
-            // foreach (var exportServiceType in exportServiceTypes)
-            // {
-            //     var serviceDescriptor = CreateServiceDescriptor(
-            //         type,
-            //         exportServiceType,
-            //         exportServiceTypes,
-            //         serviceLifetime.Value
-            //     );
-            //
-            //     if (registerAttribute?.Replace == true)
-            //     {
-            //         services.Replace(serviceDescriptor);
-            //     }
-            //     else if (registerAttribute?.TryRegister == true)
-            //     {
-            //         services.TryAdd(serviceDescriptor);
-            //     }
-            //     else
-            //     {
-            //         services.Add(serviceDescriptor);
-            //     }
-            // }
         }
 
         protected virtual List<Type> GetExportServiceTypes(Type type)
@@ -177,6 +141,19 @@ namespace Sprite.DependencyInjection
             }
 
             return null;
+        }
+
+        protected virtual void TriggerServiceExposing(IServiceCollection services, Type implementationType, List<Type> serviceTypes)
+        {
+            var exposeActions = services.GetExportServiceActivator();
+            if (exposeActions.Any())
+            {
+                var args = new ExportServiceArgs(implementationType, serviceTypes);
+                foreach (var action in exposeActions)
+                {
+                    action(args);
+                }
+            }
         }
     }
 }

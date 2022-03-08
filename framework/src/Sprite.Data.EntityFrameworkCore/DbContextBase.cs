@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using AspectCore.Extensions.Reflection;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -18,29 +21,16 @@ using Sprite.Data.EntityFrameworkCore.Extensions;
 using Sprite.Data.EntityFrameworkCore.Interceptors;
 using Sprite.DependencyInjection.Attributes;
 using Sprite.UidGenerator;
+using Z.EntityFramework.Plus;
 
 namespace Sprite.Data.EntityFrameworkCore
 {
-    // internal class ChangeAudit
-    // {
-    //     public ChangeAudit(EntityEntry entityEntry, DateTime changedTime)
-    //     {
-    //         EntityEntry = entityEntry;
-    //         ChangedTime = changedTime;
-    //     }
-    //
-    //     public EntityEntry EntityEntry { get; set; }
-    //
-    //     public DateTime ChangedTime { get; set; }
-    // }
-
     public class DbContextBase<TDbContext> : DbContext
         where TDbContext : DbContext
     {
         private readonly DbContextOptions<TDbContext> _options;
 
-        // private readonly List<ChangeAudit> _audits = new List<ChangeAudit>();
-
+        protected internal IServiceProvider ServiceProvider { get; set; }
 
         public DbContextBase(DbContextOptions<TDbContext> options)
             : base(options)
@@ -49,10 +39,14 @@ namespace Sprite.Data.EntityFrameworkCore
         }
 
 
+        protected virtual TDbContext DbContext { get; }
+
+        public IDbContextTransaction? DbContextTransaction => DbContext.Database.CurrentTransaction;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // DbContextOptionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.AddInterceptors(new[] { new StereotypedSaveChangesInterceptor<TDbContext>(_options, _principalAccessor, _idGenerator, _distributedIdGenerator) });
+            optionsBuilder.AddInterceptors(new StereotypedSaveChangesInterceptor<TDbContext>(_options, ServiceProvider));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -60,48 +54,28 @@ namespace Sprite.Data.EntityFrameworkCore
             base.OnModelCreating(modelBuilder);
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
-                // ConfigureBasePropertiesMethodInfo
-                //     .MakeGenericMethod(entityType.ClrType)
-                //     .Invoke(this, new object[] { modelBuilder, entityType });
+                ConfigureBasePropertiesMethodInfo
+                    .MakeGenericMethod(entityType.ClrType)
+                    .Invoke(this, new object[] { modelBuilder, entityType });
                 //
                 // ConfigureValueConverterMethodInfo
                 //     .MakeGenericMethod(entityType.ClrType)
                 //     .Invoke(this, new object[] { modelBuilder, entityType });
 
-                ConfigureValueGeneratedMethodInfo
-                    .MakeGenericMethod(entityType.ClrType)
+
+                ConfigureValueGeneratedMethodInfo.GetMemberInfo()
+                    .MakeGenericMethod(entityType.ClrType).GetReflector()
                     .Invoke(this, new object[] { modelBuilder, entityType });
             }
         }
 
-        protected virtual TDbContext DbContext { get; }
 
-        [Autowired]
-        private Lazy<ICurrentPrincipalAccessor> _principalAccessor;
-
-        [Autowired]
-        private Lazy<IUniqueIdGenerator> _idGenerator;
-
-        [Autowired]
-        private Lazy<IDistributedUniqueIdGenerator> _distributedIdGenerator;
-
-        protected virtual ICurrentPrincipalAccessor? PrincipalAccessor => _principalAccessor.Value;
-
-
-        public IDbContextTransaction? DbContextTransaction => DbContext.Database.CurrentTransaction;
-
-
-        protected virtual IUniqueIdGenerator IdGenerator => _idGenerator.Value;
-
-
-        protected virtual IDistributedUniqueIdGenerator? DistributedIdGenerator => _distributedIdGenerator.Value;
-
-        // private static readonly MethodInfo ConfigureBasePropertiesMethodInfo
-        //     = typeof(DbContextBase<TDbContext>)
-        //         .GetMethod(
-        //             nameof(ConfigureBaseProperties),
-        //             BindingFlags.Instance | BindingFlags.NonPublic
-        //         );
+        private static readonly MethodInfo ConfigureBasePropertiesMethodInfo
+            = typeof(DbContextBase<TDbContext>)
+                .GetMethod(
+                    nameof(ConfigureBaseProperties),
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
         //
         // private static readonly MethodInfo ConfigureValueConverterMethodInfo
         //     = typeof(DbContextBase<TDbContext>)
@@ -110,13 +84,54 @@ namespace Sprite.Data.EntityFrameworkCore
         //             BindingFlags.Instance | BindingFlags.NonPublic
         //         );
 
-        private static readonly MethodInfo ConfigureValueGeneratedMethodInfo
+        private static readonly MethodReflector ConfigureValueGeneratedMethodInfo
             = typeof(DbContextBase<TDbContext>)
                 .GetMethod(
                     nameof(ConfigureValueGenerated),
                     BindingFlags.Instance | BindingFlags.NonPublic
-                );
+                ).GetReflector();
 
+
+        protected virtual void ConfigureBaseProperties<TEntity>(ModelBuilder modelBuilder, IMutableEntityType mutableEntityType)
+            where TEntity : class
+        {
+            if (mutableEntityType.IsOwned())
+            {
+                return;
+            }
+
+            if (!typeof(IEntity).IsAssignableFrom(typeof(TEntity)))
+            {
+                return;
+            }
+
+            ConfigureGlobalFilters<TEntity>(modelBuilder, mutableEntityType);
+        }
+
+        protected virtual void ConfigureGlobalFilters<TEntity>(ModelBuilder modelBuilder, IMutableEntityType mutableEntityType)
+            where TEntity : class
+        {
+            if (mutableEntityType.BaseType == null && typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
+            {
+                var filterExpression = CreateFilterExpression<TEntity>();
+                if (filterExpression != null)
+                {
+                    modelBuilder.Entity<TEntity>().HasQueryFilter(filterExpression);
+                }
+            }
+        }
+
+        private LambdaExpression CreateFilterExpression<TEntity>() where TEntity : class
+        {
+            Expression<Func<TEntity, bool>> expression = null;
+
+            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
+            {
+                expression = e => !EF.Property<bool>(e, "IsDeleted");
+            }
+
+            return expression;
+        }
 
         protected virtual void ConfigureValueGenerated<TEntity>(ModelBuilder modelBuilder, IMutableEntityType mutableEntityType)
             where TEntity : class
@@ -124,7 +139,7 @@ namespace Sprite.Data.EntityFrameworkCore
             if (typeof(IEntity<Guid>).IsAssignableFrom(typeof(TEntity)))
             {
                 var idPropertyBuilder = modelBuilder.Entity<TEntity>().Property(x => ((IEntity<Guid>)x).Id);
-                if (idPropertyBuilder.Metadata.PropertyInfo.IsDefined(typeof(DatabaseGeneratedAttribute), true))
+                if (idPropertyBuilder.Metadata.PropertyInfo.IsDefinedAttribute(typeof(DatabaseGeneratedAttribute), true))
                 {
                     return;
                 }
@@ -135,7 +150,7 @@ namespace Sprite.Data.EntityFrameworkCore
             if (typeof(IEntity<long>).IsAssignableFrom(typeof(TEntity)))
             {
                 var idPropertyBuilder = modelBuilder.Entity<TEntity>().Property(x => ((IEntity<long>)x).Id);
-                if (idPropertyBuilder.Metadata.PropertyInfo.IsDefined(typeof(DatabaseGeneratedAttribute), true))
+                if (idPropertyBuilder.Metadata.PropertyInfo.IsDefinedAttribute(typeof(DatabaseGeneratedAttribute), true))
                 {
                     return;
                 }
@@ -146,7 +161,7 @@ namespace Sprite.Data.EntityFrameworkCore
             if (typeof(IEntity<ulong>).IsAssignableFrom(typeof(TEntity)))
             {
                 var idPropertyBuilder = modelBuilder.Entity<TEntity>().Property(x => ((IEntity<ulong>)x).Id);
-                if (idPropertyBuilder.Metadata.PropertyInfo.IsDefined(typeof(DatabaseGeneratedAttribute), true))
+                if (idPropertyBuilder.Metadata.PropertyInfo.IsDefinedAttribute(typeof(DatabaseGeneratedAttribute), true))
                 {
                     return;
                 }
@@ -325,11 +340,5 @@ namespace Sprite.Data.EntityFrameworkCore
         {
             DbContext.Database.UseTransactionAsync(transaction);
         }
-
-        // public override void Dispose()
-        // {
-        //     Console.WriteLine("DbContext已经销毁");
-        //     base.Dispose();
-        // }
     }
 }

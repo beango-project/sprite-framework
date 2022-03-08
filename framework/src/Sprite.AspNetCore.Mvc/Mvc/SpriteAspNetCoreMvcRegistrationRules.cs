@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
@@ -41,17 +42,17 @@ namespace Sprite.AspNetCore.Mvc
 
         private static bool IsController(Type type)
         {
-            return typeof(Controller).IsAssignableFrom(type) || type.IsDefined(typeof(ControllerAttribute), true);
+            return typeof(Controller).IsAssignableFrom(type) || type.IsDefined<PageModelAttribute>(true);
         }
 
         private static bool IsPageModel(Type type)
         {
-            return typeof(PageModel).IsAssignableFrom(type) || type.IsDefined(typeof(PageModelAttribute), true);
+            return typeof(PageModel).IsAssignableFrom(type) || type.IsDefined<PageModelAttribute>(true);
         }
 
         private static bool IsViewComponent(Type type)
         {
-            return typeof(ViewComponent).IsAssignableFrom(type) || type.IsDefined(typeof(ViewComponentAttribute), true);
+            return typeof(ViewComponent).IsAssignableFrom(type) || type.IsDefined<ViewComponentAttribute>(true);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -12,7 +13,7 @@ using Sprite.Web.Attributes;
 
 namespace Sprite.AspNetCore.Mvc.Results
 {
-    [Component(ServiceLifetime.Transient)]
+    // [Component(ServiceLifetime.Transient)]
     public class SpriteResultFilter : IAsyncResultFilter
     {
         public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
@@ -31,55 +32,14 @@ namespace Sprite.AspNetCore.Mvc.Results
 
             var options = GetAndSetOptions(context.HttpContext.RequestServices);
 
-            if (options.NormalizerResult && !context.ActionDescriptor.AsControllerActionDescriptor().MethodInfo.IsDefined(typeof(NonNormalizeAttribute), true))
+            if (options.NormalizerResult && !context.ActionDescriptor.AsControllerActionDescriptor().MethodInfo.IsDefinedAttribute(typeof(NonNormalizeAttribute), true))
             {
-                options.ResultHandler.Handle(context);
+                await options.ResultHandler.HandleAsync(context);
             }
 
 
             await next();
         }
-        // public void OnResultExecuting(ResultExecutingContext context)
-        // {
-        //     if (!(context.ActionDescriptor is ControllerActionDescriptor))
-        //     {
-        //         return;
-        //     }
-        //
-        //     if (context.Result is ViewResult)
-        //     {
-        //         return;
-        //     }
-        //
-        //     var options = GetAndSetOptions(context.HttpContext.RequestServices);
-        //     options.ResultHandler.Handle(context);
-        // }
-        //
-        // public void OnResultExecuted(ResultExecutedContext context)
-        // {
-        // }
-
-        // private IActionResultNormalizer HandleAndGetResultType(ResultExecutingContext context)
-        // {
-        //     Check.NotNull(context, nameof(context));
-        //
-        //     if (context.Result is ObjectResult)
-        //     {
-        //         return new ObjectResultNormalizer(context.HttpContext.RequestServices);
-        //     }
-        //
-        //     if (context.Result is JsonResult)
-        //     {
-        //         return new JsonActionResultNormalizer();
-        //     }
-        //
-        //     if (context.Result is EmptyResult)
-        //     {
-        //         return new EmptyActionResultNormalizer();
-        //     }
-        //
-        //     return new NullActionResultNormalizer();
-        // }
 
         private AspNetCoreMvcOptions GetAndSetOptions(IServiceProvider serviceProvider)
         {
@@ -95,5 +55,7 @@ namespace Sprite.AspNetCore.Mvc.Results
 
             return mvcOptions?.Value;
         }
+
+       
     }
 }

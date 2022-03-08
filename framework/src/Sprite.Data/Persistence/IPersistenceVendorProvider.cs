@@ -1,6 +1,6 @@
 ﻿namespace Sprite.Data.Persistence
 {
-    public interface IPersistenceVendoProvider
+    public interface IPersistenceVendorProvider
     {
         IVendor GetPersistenceVendor();
     }

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
+using ImmediateReflection;
 using JetBrains.Annotations;
 
 namespace Sprite.Modular
 {
     public class ModuleScanner : IModuleScanner
     {
+        internal static ConcurrentDictionary<Type, ModuleConfig?> _moduleAndConfigMapsCache = new ConcurrentDictionary<Type, ModuleConfig?>();
+
         public List<Type> FindModuleTypes(Type tModuleType)
         {
             var moduleTypes = new List<Type>();
@@ -17,12 +20,11 @@ namespace Sprite.Modular
         public List<Type> FindModuleDepends(Type tModuleType)
         {
             var dependencies = new List<Type>();
-            var configureType = FindModuleConfigure(tModuleType);
-            if (configureType != null)
+            var moduleImmediateType = tModuleType.GetImmediateType();
+            var moduleConfig = FindModuleConfig(moduleImmediateType);
+            if (moduleConfig != null)
             {
-                var moduleConfigure = (ModuleConfig)Activator.CreateInstance(configureType)!;
-                moduleConfigure.Configure(); //调用导入模块方法
-                foreach (var depended in moduleConfigure.DependedModules)
+                foreach (var depended in moduleConfig.DependedModules)
                 {
                     dependencies.AddIfNotContains(depended);
                 }
@@ -31,21 +33,53 @@ namespace Sprite.Modular
             return dependencies;
         }
 
-
-        [CanBeNull]
-        public Type FindModuleConfigure(Type tModuleType)
+        public List<Type> FindModuleDepends(Type tModuleType, out ModuleConfig config)
         {
-            var attribute = tModuleType.GetCustomAttribute<UsageAttribute>();
-            if (attribute != null)
+            var dependencies = new List<Type>();
+            var moduleImmediateType = tModuleType.GetImmediateType();
+            var moduleConfig = FindModuleConfig(moduleImmediateType);
+            if (moduleConfig != null)
             {
-                var moduleConfigure = attribute.ModuleConfigure;
-                if (moduleConfigure.IsClass && !moduleConfigure.IsAbstract && !moduleConfigure.IsGenericType && typeof(ModuleConfig).IsAssignableFrom(moduleConfigure))
+                moduleConfig.Configure(); //调用导入模块方法
+                foreach (var depended in moduleConfig.DependedModules)
                 {
-                    return moduleConfigure;
+                    dependencies.AddIfNotContains(depended);
                 }
             }
 
-            return null;
+            config = null;
+
+            return dependencies;
+        }
+
+
+        [CanBeNull]
+        public ModuleConfig FindModuleConfig(Type tModuleType)
+        {
+            return FindModuleConfig(tModuleType.GetImmediateType());
+        }
+
+        [CanBeNull]
+        private ModuleConfig FindModuleConfig(ImmediateType tModuleType)
+        {
+            //如果没有从缓存中命中，则使用反射获取实例化并调用Configure()方法
+            if (!_moduleAndConfigMapsCache.TryGetValue(tModuleType.Type, out var moduleConfig))
+            {
+                var attribute = tModuleType.GetAttribute<UsageAttribute>();
+                if (attribute != null)
+                {
+                    var moduleConfigType = attribute.ModuleConfig;
+                    if (moduleConfigType.IsClass && !moduleConfigType.IsAbstract && !moduleConfigType.IsGenericType && typeof(ModuleConfig).IsAssignableFrom(moduleConfigType))
+                    {
+                        moduleConfig = (ModuleConfig)moduleConfigType.New();
+                        moduleConfig.Configure(); //调用导入模块方法
+                        _moduleAndConfigMapsCache[tModuleType.Type] = moduleConfig;
+                        return moduleConfig;
+                    }
+                }
+            }
+
+            return moduleConfig;
         }
 
         private void AddModulesDndResolveDependencies(List<Type> moduleTypes, Type tModuleType)

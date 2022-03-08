@@ -12,6 +12,8 @@ namespace Sprite.DependencyInjection.Attributes
         [CanBeNull]
         public object Key { get; set; }
 
+        public bool IsRequired { get; set; }
+
         public AutowiredAttribute()
         {
         }

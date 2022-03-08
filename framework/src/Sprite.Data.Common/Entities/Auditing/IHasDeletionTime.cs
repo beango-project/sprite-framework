@@ -7,6 +7,7 @@ namespace Sprite.Data.Entities.Auditing
         /// <summary>
         /// Deletion time.
         /// </summary>
+        [DeletionTime]
         DateTime? DeletionTime { get; set; }
     }
 }

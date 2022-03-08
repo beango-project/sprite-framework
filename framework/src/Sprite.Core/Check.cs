@@ -17,6 +17,15 @@ namespace Sprite
 
             return value;
         }
-        
+
+        public static string NotNullOrEmpty(string value, [InvokerParameterName] [NotNull] string parameterName)
+        {
+            if(value.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            return value;
+        }
     }
 }

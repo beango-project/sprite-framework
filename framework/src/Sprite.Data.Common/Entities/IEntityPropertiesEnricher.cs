@@ -1,7 +1,8 @@
-﻿namespace Sprite.Data.Entities
+﻿using System;
+
+namespace Sprite.Data.Entities
 {
-    public interface IEntityPropertiesEnricher
+    public interface IEntityPropertiesEnricher : IObjectPropertiesEnricher
     {
-        ExtraProperties ExtraProperties { get; }
     }
 }

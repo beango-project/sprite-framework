@@ -27,6 +27,10 @@ namespace Sprite.Modular
         public IReadOnlySet<IModuleDefinition> DependModules => _dependModules.ToImmutableHashSet();
         public IReadOnlySet<IModuleProcessor> Processors => _processors.ToImmutableHashSet();
         public bool IsSkipAutoScanRegister { get; }
+        public void RemoveProcessor(IModuleProcessor processor)
+        {
+            _processors.Remove(processor);
+        }
 
         public void AddDependModules(IModuleDefinition moduleDefinition)
         {

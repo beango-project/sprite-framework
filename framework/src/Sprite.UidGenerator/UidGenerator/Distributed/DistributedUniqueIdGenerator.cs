@@ -1,17 +1,27 @@
-﻿namespace Sprite.UidGenerator
-{
-    public class DistributedUniqueIdGenerator : IDistributedUniqueIdGenerator
-    {
-        private readonly ISequentialUidProvider<long> _uidProvider;
+﻿using Microsoft.Extensions.Options;
 
-        public DistributedUniqueIdGenerator(ISequentialUidProvider<long> uidProvider)
+namespace Sprite.UidGenerator
+{
+    public abstract class DistributedUniqueIdGeneratorBase<T> : IDistributedUniqueIdGenerator<T>
+    {
+        private readonly IUidProvider<T> _provider;
+
+        protected DistributedUniqueIdGeneratorBase(IUidProvider<T> provider)
         {
-            _uidProvider = uidProvider;
+            _provider = provider;
         }
 
-        public long NextId()
+
+        public virtual T NextId() => UiProvider.Create();
+
+
+        public virtual IUidProvider<T> UiProvider => _provider;
+    }
+
+    public class DistributedUniqueIdGenerator : DistributedUniqueIdGeneratorBase<long>, IDistributedUniqueIdGenerator
+    {
+        public DistributedUniqueIdGenerator(IUidProvider<long> provider) : base(provider)
         {
-            return _uidProvider.NextId();
         }
     }
 }

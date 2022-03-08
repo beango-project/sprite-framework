@@ -3,11 +3,15 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <OutputType>Library</OutputType>
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Authors>Sprite</Authors>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,7 +24,6 @@
     <ItemGroup>
         <Folder Include="Abstractions" />
         <Folder Include="Caches" />
-        <Folder Include="Identity\Repositores" />
         <Folder Include="Properties\" />
     </ItemGroup>
 

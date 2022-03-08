@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Sprite;
 
@@ -10,8 +11,9 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionCommonExtensions
     {
-        public static void AddTransient(this IServiceCollection services, Type serviceType, string serviceKey)
+        public static void AddTransient(this IServiceCollection services, Type serviceType, string serviceKey = null)
         {
+            // services.GetSingletonInstance<Ser>()
         }
 
         public static T GetRequestSingletonInstance<T>(this IServiceCollection services)
@@ -78,15 +80,21 @@ namespace Microsoft.Extensions.DependencyInjection
             return serviceProviderFactory.CreateServiceProvider(builder);
         }
 
+        public static void ReplaceConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Replace(ServiceDescriptor.Singleton<IConfiguration>(configuration));
+        }
+
         public static IConfiguration GetConfiguration(this IServiceCollection services)
         {
             var hostBuilderContext = services.GetSingletonInstance<HostBuilderContext>();
+
             if (hostBuilderContext?.Configuration != null)
             {
                 return hostBuilderContext.Configuration as IConfigurationRoot;
             }
 
-            return services.GetSingletonInstance<IConfiguration>();
+            return services.GetRequestSingletonInstance<IConfiguration>();
         }
     }
 }

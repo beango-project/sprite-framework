@@ -20,8 +20,7 @@ namespace Sprite.AspNetCore.Mvc.Results.Normalization
             {
                 throw new ArgumentException($"{nameof(context.Result)} must be ObjectResult!");
             }
-
-
+            
             objectResult.DeclaredType = typeof(RestNormalizedResultResponse);
             objectResult.Value = new RestNormalizedResultResponse(objectResult.Value);
             

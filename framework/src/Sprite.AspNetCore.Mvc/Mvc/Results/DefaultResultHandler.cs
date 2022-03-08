@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Sprite.AspNetCore.Mvc.Results.Normalization;
@@ -16,12 +18,21 @@ namespace Sprite.AspNetCore.Mvc.Results
             GetNormalizerKind(context).Normalizer(context);
         }
 
+        public override ValueTask HandleAsync(ResultExecutingContext context)
+        {
+            Check.NotNull(context, nameof(context));
+
+            GetNormalizerKind(context).Normalizer(context);
+            
+            return ValueTask.CompletedTask;
+        }
+
         protected virtual IActionResultNormalizer GetNormalizerKind(ResultExecutingContext context)
         {
             if (context.Result is ContentResult)
             {
-                
             }
+
             if (context.Result is ObjectResult)
             {
                 return new ObjectResultNormalizer(context.HttpContext.RequestServices);

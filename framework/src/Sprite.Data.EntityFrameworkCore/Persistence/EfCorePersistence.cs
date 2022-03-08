@@ -25,7 +25,7 @@ namespace Sprite.Data.EntityFrameworkCore.Persistence
 
 
         // public List<TDbContext> HookUpDbContexts { get; }
-        public TDbContext DbContext { get; }
+        public TDbContext DbContext { get; private set; }
 
         public IDbContextTransaction? DbContextTransaction => DbContext.Database.CurrentTransaction;
 
@@ -40,7 +40,7 @@ namespace Sprite.Data.EntityFrameworkCore.Persistence
 
             _isDispose = true;
 
-            // DbContextTransaction?.Dispose();
+            DbContextTransaction?.Dispose();
             // DbContext.Dispose();
             // GC.SuppressFinalize(this);
         }
@@ -123,5 +123,16 @@ namespace Sprite.Data.EntityFrameworkCore.Persistence
         public bool IsDispose => _isDispose;
 
         public DbConnection DbConnection => DbContext.Database.GetDbConnection();
+
+        public ValueTask DisposeAsync()
+        {
+            if (_isDispose)
+            {
+                return ValueTask.CompletedTask;
+            }
+
+            _isDispose = true;
+            return ValueTask.CompletedTask;
+        }
     }
 }

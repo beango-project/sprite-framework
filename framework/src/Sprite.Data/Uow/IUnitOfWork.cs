@@ -13,19 +13,33 @@ using Sprite.DependencyInjection;
 
 namespace Sprite.Data.Uow
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
         Guid Id { get; }
 
-        bool IsDisposed { get; }
-
         bool IsCompleted { get; }
 
+        bool IsDisposed { get; }
+
+        bool IsReserved { get; }
+
         bool IsSupportTransaction { get; }
-        
+
+        bool HasTransaction { get; }
+
+        bool Activated { get; }
+
+        string ReservationKey { get; }
+
+        // IDictionary<object,object> Items { get; }
+
         IUnitOfWork Outer { get; set; }
 
         TransactionOptions Options { get; }
+
+        void Active(TransactionOptions options = null);
+
+        void SetOptions(TransactionOptions options);
 
         IVendor GetOrAddVendor(string key, IVendor vendor);
 
@@ -55,8 +69,8 @@ namespace Sprite.Data.Uow
 
         Task CompletedAsync(CancellationToken cancellationToken = default);
 
-        public event EventHandler OnCompleted;
-        public event EventHandler OnFailed;
-        public event EventHandler OnDisposed;
+        event EventHandler OnCompleted;
+        event EventHandler OnFailed;
+        event EventHandler OnDisposed;
     }
 }

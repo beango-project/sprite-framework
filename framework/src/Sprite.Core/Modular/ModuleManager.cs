@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AspectCore.Extensions.Reflection;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,22 +49,24 @@ namespace Sprite.Modular
 
         private void ProcessModuleConfigure(OnApplicationContext context, IModuleDefinition module)
         {
-            var configureMethod = module.ModuleInstance.GetType().GetMethod(ModuleConfigureName);
+            var moduleTypeInfo = module.ModuleInstance.GetType().GetReflector().GetMemberInfo();
+            var configureMethod = moduleTypeInfo.GetMethod(ModuleConfigureName);
             if (configureMethod == null)
             {
                 return;
             }
 
+            var memberInfo = configureMethod.GetReflector();
             var isCandidate = configureMethod.ReturnType == typeof(void) && !configureMethod.IsStatic && !configureMethod.IsAbstract && !configureMethod.IsConstructor;
             if (isCandidate)
             {
-                var parameters = configureMethod.GetParameters();
+                var parameters = memberInfo.ParameterReflectors;
                 var methodsParameters = new object[parameters.Length];
                 for (var i = 0; i < parameters.Length; i++)
                 {
-                    if (parameters[i].HasDefaultValue)
+                    if (parameters[i].HasDeflautValue)
                     {
-                        methodsParameters[i] = parameters[i].DefaultValue;
+                        methodsParameters[i] = parameters[i].DefalutValue;
                         continue;
                     }
 
@@ -80,7 +83,7 @@ namespace Sprite.Modular
                     }
                 }
 
-                configureMethod.Invoke(module.ModuleInstance, methodsParameters);
+                memberInfo.Invoke(module.ModuleInstance, methodsParameters);
             }
         }
 

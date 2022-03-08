@@ -2,13 +2,17 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ImTools;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
+using Nito.Disposables;
 using Sprite.Data.Entities;
 using Sprite.Data.Persistence;
 using Sprite.Data.Repositories;
@@ -25,12 +29,19 @@ namespace Sprite.Data.Uow
         public Guid Id { get; }
         public bool IsDisposed { get; private set; }
 
+        public bool IsReserved { get; private set; }
+
         public bool IsCompleted { get; private set; }
-        public bool IsSupportTransaction { get; }
+        public bool IsSupportTransaction { get; private set; }
+
+        public virtual bool HasTransaction => CheckTransactions();
+
+        public bool Activated { get; private set; }
+
+        public string ReservationKey { get; }
 
         public IUnitOfWork Outer { get; set; }
 
-        // public TPersistenceVendor Vendor { get; }
         public TransactionOptions Options { get; private set; }
 
         private ImHashMap<string, IVendor> _vendorMap;
@@ -41,25 +52,18 @@ namespace Sprite.Data.Uow
         {
             Options = Check.NotNull(options, nameof(options));
             Id = Guid.NewGuid();
-            switch (options.Propagation)
-            {
-                case Propagation.Required:
-                case Propagation.Auto:
-                case Propagation.Supports:
-                case Propagation.RequiresNew:
-                case Propagation.Mandatory:
-                case Propagation.Nested:
-                    IsSupportTransaction = true;
-                    break;
-                case Propagation.NotSupported:
-                case Propagation.Never:
-                    IsSupportTransaction = false;
-                    break;
-            }
-
-            // Vendor = vendor;
             _vendorMap = ImHashMap<string, IVendor>.Empty;
             _txMap = ImHashMap<string, DbTransaction>.Empty;
+            Active();
+        }
+
+        public UnitOfWork(string reservationKey)
+        {
+            ReservationKey = Check.NotNullOrEmpty(reservationKey, nameof(reservationKey));
+            Id = Guid.NewGuid();
+            _vendorMap = ImHashMap<string, IVendor>.Empty;
+            _txMap = ImHashMap<string, DbTransaction>.Empty;
+            IsReserved = true;
         }
 
         public virtual void Dispose()
@@ -79,10 +83,30 @@ namespace Sprite.Data.Uow
             }
 
             OnDisposed?.Invoke(this, null);
-            // _vendorMap = null;
-            // _txMap = null;
+            _vendorMap = null;
+            _txMap = null;
+
+            Unsubscribe();
         }
 
+
+        public void Active(TransactionOptions options = null)
+        {
+            if (Activated)
+            {
+                throw new Exception("This unit of work has been activated before!");
+            }
+
+            Options = options ?? Options;
+            Activated = true;
+            IsReserved = false;
+            SetTransactionPropagation();
+        }
+
+        public void SetOptions(TransactionOptions options)
+        {
+            Options = Check.NotNull(options, nameof(options));
+        }
 
         public IVendor GetOrAddVendor(string key, IVendor vendor)
         {
@@ -90,6 +114,11 @@ namespace Sprite.Data.Uow
             if (_vendorMap.TryFind(key, out _))
             {
                 return vendor;
+            }
+
+            if (!Activated)
+            {
+                Active();
             }
 
             _vendorMap = _vendorMap.AddOrUpdate(key, vendor);
@@ -120,6 +149,11 @@ namespace Sprite.Data.Uow
             if (_txMap.Contains(key))
             {
                 throw new Exception("There is already a transaction API in this unit of work with given key: " + key);
+            }
+
+            if (!Activated)
+            {
+                Active();
             }
 
             _txMap = _txMap.AddOrUpdate(key, dbTransaction);
@@ -206,45 +240,63 @@ namespace Sprite.Data.Uow
 
         public void Rollback()
         {
+            if (_isRolledback)
+            {
+                return;
+            }
+
+            _isRolledback = true;
+            
             foreach (var entry in _vendorMap.Enumerate())
             {
                 if (entry.Value is ISupportTransaction transaction)
                 {
-                    transaction.Rollback();
-                }
-            }
-        }
-
-        public async Task RollbackAsync(CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                foreach (var entry in _vendorMap.Enumerate())
-                {
-                    if (entry.Value is ISupportTransaction transaction)
-                    {
-                        await transaction.RollbackAsync(cancellationToken);
-                    }
-                }
-
-                foreach (var txEntry in _txMap.Enumerate())
-                {
                     try
                     {
-                        if (txEntry.Value.Connection != null)
-                        {
-                            txEntry.Value.Rollback();
-                        }
+                        transaction.Rollback();
                     }
                     catch
                     {
                     }
                 }
             }
-            catch (Exception e)
+        }
+
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
+        {
+            if (_isRolledback)
             {
-                Console.WriteLine(e);
-                throw;
+                return;
+            }
+
+            _isRolledback = true;
+            
+            foreach (var entry in _vendorMap.Enumerate())
+            {
+                try
+                {
+                    if (entry.Value is ISupportTransaction transaction)
+                    {
+                        await transaction.RollbackAsync(cancellationToken);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            foreach (var txEntry in _txMap.Enumerate())
+            {
+                try
+                {
+                    if (txEntry.Value.Connection != null)
+                    {
+                        await txEntry.Value.RollbackAsync(cancellationToken);
+                    }
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -311,18 +363,50 @@ namespace Sprite.Data.Uow
         }
 
 
+        protected bool CheckTransactions()
+        {
+            return _vendorMap.Enumerate().Any(x =>
+            {
+                if (x.Value is ISupportTransaction supportTransaction && supportTransaction.CurrentTransaction != null)
+                {
+                    return true;
+                }
+
+                return false;
+            }) && _txMap.IsEmpty;
+        }
+
+        protected virtual void SetTransactionPropagation()
+        {
+            switch (Options.Propagation)
+            {
+                case Propagation.Required:
+                case Propagation.Auto:
+                case Propagation.Supports:
+                case Propagation.RequiresNew:
+                case Propagation.Mandatory:
+                case Propagation.Nested:
+                    IsSupportTransaction = true;
+                    break;
+                case Propagation.NotSupported:
+                case Propagation.Never:
+                    IsSupportTransaction = false;
+                    break;
+            }
+        }
+
         private void DisposeTransactions()
         {
-            foreach (var entry in _vendorMap.Enumerate())
-            {
-                try
-                {
-                    entry.Value.Dispose();
-                }
-                catch
-                {
-                }
-            }
+            // foreach (var entry in _vendorMap.Enumerate())
+            // {
+            //     try
+            //     {
+            //         entry.Value.Dispose();
+            //     }
+            //     catch
+            //     {
+            //     }
+            // }
 
             foreach (var entry in _txMap.Enumerate())
             {
@@ -333,6 +417,66 @@ namespace Sprite.Data.Uow
                 catch
                 {
                 }
+            }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            IsDisposed = true;
+
+            // foreach (var entry in _vendorMap.Enumerate())
+            // {
+            //     try
+            //     {
+            //         await entry.Value.DisposeAsync();
+            //     }
+            //     catch
+            //     {
+            //     }
+            // }
+
+            foreach (var entry in _txMap.Enumerate())
+            {
+                try
+                {
+                    await entry.Value.DisposeAsync();
+                }
+                catch
+                {
+                }
+            }
+
+            if (!IsCompleted || _exception != null)
+            {
+                OnFailed?.Invoke(this, null);
+            }
+
+            OnDisposed?.Invoke(this, null);
+        }
+
+        /// <summary>
+        /// 清除事件处理器订阅列表，防止内存泄漏
+        /// </summary>
+        protected virtual void Unsubscribe()
+        {
+            foreach (var e in OnCompleted.GetInvocationList())
+            {
+                OnCompleted -= (EventHandler)e;
+            }
+
+            foreach (var e in OnFailed.GetInvocationList())
+            {
+                OnFailed -= (EventHandler)e;
+            }
+
+            foreach (var e in OnDisposed.GetInvocationList())
+            {
+                OnDisposed -= (EventHandler)e;
             }
         }
     }

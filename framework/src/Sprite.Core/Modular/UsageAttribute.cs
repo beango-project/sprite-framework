@@ -5,11 +5,11 @@ namespace Sprite.Modular
     [AttributeUsage(AttributeTargets.Class)]
     public class UsageAttribute : Attribute
     {
-        public UsageAttribute(Type moduleConfigure)
+        public UsageAttribute(Type moduleConfig)
         {
-            ModuleConfigure = moduleConfigure;
+            ModuleConfig = moduleConfig;
         }
 
-        public Type ModuleConfigure { get; }
+        public Type ModuleConfig { get; }
     }
 }

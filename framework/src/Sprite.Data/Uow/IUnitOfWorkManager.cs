@@ -9,5 +9,9 @@ namespace Sprite.Data.Uow
         IUnitOfWork? CurrentUow { get; }
 
         IUnitOfWork Begin(TransactionOptions options = null);
+
+        IUnitOfWork Reserve(string reservationName);
+        
+        bool TryBeginReserved(string reservationKey, TransactionOptions options);
     }
 }

@@ -18,63 +18,77 @@ namespace Sprite.DependencyInjection.Grace
         {
             var container = new DependencyInjectionContainer();
             // container.Configure(c => c.ImportMembers(info => info.IsDefinedAttribute(typeof(AutowiredAttribute), true)));
-            container.Add(new MyConfigurationModule());
+            container.Add(new SpriteGraceConfigurationModule());
 
             return container;
         }
     }
 
-    public class MyConfigurationModule : IConfigurationModule
+    public class SpriteGraceConfigurationModule : IConfigurationModule
     {
+        private readonly Assembly _exportAssembly;
+
+        public SpriteGraceConfigurationModule(Assembly exportAssembly = null)
+        {
+            _exportAssembly = exportAssembly ?? null;
+        }
+
         public void Configure(IExportRegistrationBlock registrationBlock)
         {
-            registrationBlock.AddMemberInjectionSelector(new MyMemberInjectionSelector());
+            if (_exportAssembly != null)
+            {
+                registrationBlock.ExportAssembly(_exportAssembly).ExportAttributedTypes().Where(TypesThat.AreInTheSameNamespaceAs<AutowiredAttribute>());
+            }
+
+            registrationBlock.AddMemberInjectionSelector(new SpriteMemberInjectionSelector());
         }
     }
 
-    public class MyMemberInjectionSelector : IMemberInjectionSelector
+    public class SpriteMemberInjectionSelector : IMemberInjectionSelector
     {
         public IEnumerable<MemberInjectionInfo> GetPropertiesAndFields(Type type, IInjectionScope injectionScope, IActivationExpressionRequest request)
         {
-            foreach (var declaredMember in type.GetTypeInfo().DeclaredMembers)
+            var memberInfos = new List<MemberInfo>();
+            var currentType = type;
+
+            while (currentType != null && currentType.Name != nameof(Object))
             {
-                Type importType = null;
-                var propertyInfo = declaredMember as PropertyInfo;
-
-                if (propertyInfo != null)
-                {
-                    if (propertyInfo.CanWrite)
-                    {
-                        importType = propertyInfo.PropertyType;
-                    }
-                }
-                else if (declaredMember is FieldInfo fieldInfo)
-                {
-                    importType = fieldInfo.FieldType;
-                }
-
-                if (importType == null)
-                {
-                    continue;
-                }
-
-                var attr = declaredMember.GetAttributeWithDefined<ImportAttribute>();
+                memberInfos.AddRange(currentType.GetTypeInfo().DeclaredMembers);
+                currentType = currentType.BaseType;
+            }
+            
+            foreach (var declaredMember in memberInfos.Where(m => m is PropertyInfo property && property.CanWrite || m is FieldInfo))
+            {
+                var attr = declaredMember.GetAttributeWithDefined<AutowiredAttribute>();
 
                 if (attr != null)
                 {
-                    // Try to set the default value
-                    object localValue = null;
+                    object value = null;
+                    object Key = null;
                     if (attr.Type != null)
                     {
-                        injectionScope.TryLocate(attr.Type, out localValue);
-                    }
+                        if (attr.Key != null)
+                        {
+                            Key = attr.Key;
+                        }
+                        else
+                        {
+                            Key = attr.Type;
+                        }
 
+                        // if (injectionScope.ScopeConfiguration.Behaviors.KeyedTypeSelector(attr.Type))
+                        // {
+                        //     
+                        // }
+                        injectionScope.TryLocate(attr.Type, out value);
+                    }
 
                     yield return new MemberInjectionInfo()
                     {
                         MemberInfo = declaredMember,
                         IsRequired = attr.IsRequired,
-                        DefaultValue = localValue,//Given value, but doesn't work
+                        DefaultValue = value,
+                        LocateKey = Key
                     };
                 }
             }
@@ -84,12 +98,5 @@ namespace Sprite.DependencyInjection.Grace
         {
             yield break;
         }
-    }
-
-    class ImportAttribute : Attribute
-    {
-        public Type Type { get; set; }
-
-        public bool IsRequired { get; set; }
     }
 }

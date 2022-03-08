@@ -22,7 +22,7 @@ namespace Sprite.DependencyInjection.DryIoc
             return _container;
         }
 
-        public override IServiceProviderFactory<IContainer> CreateServiceProviderFactory()
+        public override DryIocServiceProviderFactory CreateServiceProviderFactory()
         {
             return new DryIocServiceProviderFactory(_container);
         }

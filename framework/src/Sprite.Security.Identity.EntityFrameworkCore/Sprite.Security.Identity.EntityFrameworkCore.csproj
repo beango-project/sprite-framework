@@ -2,11 +2,14 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Authors>Sprite</Authors>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sprite.Data.EntityFrameworkCore\Sprite.Data.EntityFrameworkCore.csproj"/>
-        <ProjectReference Include="..\Sprite.Security\Sprite.Security.csproj"/>
+      <ProjectReference Include="..\Sprite.Data.EntityFrameworkCore\Sprite.Data.EntityFrameworkCore.csproj" />
+      <ProjectReference Include="..\Sprite.Security\Sprite.Security.csproj" />
     </ItemGroup>
 
 </Project>

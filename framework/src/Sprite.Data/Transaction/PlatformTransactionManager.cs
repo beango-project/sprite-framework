@@ -5,7 +5,7 @@ namespace Sprite.Data.Transaction
 {
     public class PlatformTransactionManager : ITransactionManager
     {
-        private IPersistenceVenderProvider _persistenceVender;
+        private IPersistenceVendorProvider _persistenceVendor;
 
         private AmbientTransaction _AmbientTransaction { get; }
         public ITransactionInfo CurrentTransaction => CurrentTransaction;
@@ -15,7 +15,7 @@ namespace Sprite.Data.Transaction
         {
             if (descriptor.Propagation == Propagation.RequiresNew && CurrentTransaction != null)
             {
-                var persistenceVender = _persistenceVender.GetPersistenceVender();
+                var persistenceVender = _persistenceVendor.GetPersistenceVendor();
                 return CreateNewTransaction(descriptor);
             }
 

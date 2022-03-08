@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Sprite.Data.EntityFrameworkCore.Conventions;
 using Sprite.Data.Transaction;
@@ -19,16 +20,13 @@ namespace Sprite.Data.EntityFrameworkCore.Extensions
 
         public DbContextOptionsUidGeneratorExtension(DbContextUidGeneratorOptions options)
         {
-            if (options.IsDistributed && options.UidGeneratorType.IsAssignableFrom(typeof(IDistributedUniqueIdGenerator))!)
-            {
-                throw new ArgumentException($"Given {options.UidGeneratorType} must be {nameof(IUniqueIdGenerator)} or {nameof(IDistributedUniqueIdGenerator)} implement");
-            }
-
+            Check.NotNull(options, nameof(options));
             _options = options;
         }
 
         public void ApplyServices(IServiceCollection services)
         {
+            // services.TryAddSingleton(_options.UidGeneratorType,s=>s.GetRequiredService(_options.UidGeneratorType));
         }
 
         public void Validate(IDbContextOptions options)
