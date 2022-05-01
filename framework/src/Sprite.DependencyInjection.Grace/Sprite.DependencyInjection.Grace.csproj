@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Sprite.Castle.Core\Sprite.Castle.Core.csproj" />
       <ProjectReference Include="..\Sprite.Core\Sprite.Core.csproj" />
     </ItemGroup>
 

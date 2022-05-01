@@ -28,9 +28,6 @@ namespace Sprite.AspNetCore.Mvc.ExceptionHandles
 
         private async Task HandleAndWrapException(ExceptionContext context)
         {
-            // context.HttpContext.Response.StatusCode = context.HttpContext
-            //     .RequestServices.GetRequiredService<IHttpExceptionStatusCodeFinder>()
-            //     .GetStatusCode(context.HttpContext, context.Exception);
             await Task.Run(() =>
             {
                 context.HttpContext.Response.StatusCode = (int)GetStatusCode(context.HttpContext, context.Exception);

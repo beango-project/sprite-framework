@@ -12,6 +12,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Properties\launchSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Sprite.AspNetCore\Sprite.AspNetCore.csproj" />
         <ProjectReference Include="..\Sprite.Data\Sprite.Data.csproj" />
     </ItemGroup>

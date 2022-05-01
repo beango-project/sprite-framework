@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sprite.UI", "src\Sprite.UI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sprite.UI.Navigation", "src\Sprite.UI.Navigation\Sprite.UI.Navigation.csproj", "{F492B076-71E7-4C20-8E15-527DC189784C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprite.DependencyInjection.Grace.Tests", "test\Sprite.DependencyInjection.Grace.Tests\Sprite.DependencyInjection.Grace.Tests.csproj", "{699E6A88-853B-4218-895C-5597255655FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -199,6 +201,10 @@ Global
 		{F492B076-71E7-4C20-8E15-527DC189784C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F492B076-71E7-4C20-8E15-527DC189784C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F492B076-71E7-4C20-8E15-527DC189784C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{699E6A88-853B-4218-895C-5597255655FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{699E6A88-853B-4218-895C-5597255655FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{699E6A88-853B-4218-895C-5597255655FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{699E6A88-853B-4218-895C-5597255655FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -235,6 +241,7 @@ Global
 		{FA517E42-1875-4E01-B417-E49BA3719C99} = {F3DE9974-7F30-4081-A531-B425E0F21DF3}
 		{8F44F6F5-6A70-4FB3-9CCE-6552690D188A} = {5CD43197-AFCA-4FEA-9740-0B87C7342209}
 		{F492B076-71E7-4C20-8E15-527DC189784C} = {5CD43197-AFCA-4FEA-9740-0B87C7342209}
+		{699E6A88-853B-4218-895C-5597255655FE} = {F3DE9974-7F30-4081-A531-B425E0F21DF3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1E81452-0D36-4465-95A4-03F34E6A76AC}

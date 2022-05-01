@@ -22,6 +22,7 @@ namespace Sprite
             }
 
             ServiceProvider = serviceProvider;
+            _initialized = true;
         }
 
         public static object GetInstance(Type type) => ServiceProvider.GetRequiredService(type);

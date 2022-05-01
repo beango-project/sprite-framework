@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Options;
 using Sprite.Data.EntityFrameworkCore.Extensions;
-using Sprite.UidGenerator;
 
-namespace Microsoft.EntityFrameworkCor
+namespace Microsoft.EntityFrameworkCore
 {
     public static class DbContextOptionsBuilderExtensions
     {

@@ -14,8 +14,9 @@ namespace Sprite.DependencyInjection.DryIoc
 
         public static DryIocServiceProviderFactory AddDryIocServiceProviderFactory(this IServiceCollection services)
         {
-            var container = DryIocServiceProviderBuilder.Build();
-            var factory = new DryIocServiceProviderFactory(container);
+            var adapter = new DryIocServiceProviderAdapter();
+            adapter.Initialization();
+            var factory = adapter.CreateServiceProviderFactory();
             services.TryAddSingleton((IServiceProviderFactory<IContainer>)factory);
             return factory;
         }

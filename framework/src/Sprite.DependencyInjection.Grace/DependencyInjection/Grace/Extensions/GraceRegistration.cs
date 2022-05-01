@@ -1,7 +1,11 @@
 ﻿// using Grace 
+
 using System;
 using System.Collections.Generic;
+using Grace.DependencyInjection.Extensions.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Sprite.DynamicProxy;
 #if NET5_0
 using System.Threading.Tasks;
 #endif
@@ -27,8 +31,9 @@ namespace Grace.DependencyInjection.Extensions
                 c.Export<GraceServiceProvider>().As<IServiceProvider>().ExternallyOwned();
                 c.Export<GraceLifetimeScopeServiceScopeFactory>().As<IServiceScopeFactory>();
                 Register(c, descriptors);
+                RegisterIntercepts(c,descriptors);
             });
-
+            
             // return exportLocator.Locate<IServiceProvider>();
         }
 
@@ -85,6 +90,34 @@ namespace Grace.DependencyInjection.Extensions
             }
 
             return configuration;
+        }
+
+        private static void RegisterIntercepts(IExportRegistrationBlock c, IEnumerable<ServiceDescriptor> descriptors)
+        {
+            if (c.OwningScope.TryLocate(out IOptions<InterceptorOptions> options))
+            {
+                foreach (var bindingContext in options.Value.InterceptorBindings)
+                {
+                    if (bindingContext.Selector != null)
+                    {
+                        var serviceDescriptors = descriptors.Where(s => bindingContext.Selector(s.ServiceType));
+                        
+                        foreach (var serviceDescriptor in serviceDescriptors)
+                        {
+                            if (bindingContext.IgnoreMethods != null)
+                            {
+                                var method = GraceInterception.InterceptAsyncMethod.MakeGenericMethod(serviceDescriptor.ServiceType, bindingContext.Interceptor);
+                                method.Invoke(c,null);
+                            }
+                            else
+                            {
+                                var method = GraceInterception.InterceptAsyncMethod.MakeGenericMethod(serviceDescriptor.ServiceType, bindingContext.Interceptor);
+                                method.Invoke(c,null);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

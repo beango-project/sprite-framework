@@ -1,11 +1,11 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sprite;
 using Sprite.Context;
 using Sprite.DependencyInjection;
 
-namespace Sprite.AspNetCore.Builder
+namespace Microsoft.AspNetCore.Builder
 {
     public static class SpriteApplicationBuilderExtensions
     {

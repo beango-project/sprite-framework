@@ -1,4 +1,5 @@
-﻿using Sprite.Modular;
+﻿using Sprite.Data;
+using Sprite.Modular;
 
 namespace Sprite.AspNetCore.Mvc
 {
@@ -6,7 +7,7 @@ namespace Sprite.AspNetCore.Mvc
     {
         public override void Configure()
         {
-            ImportModules(typeof(SpriteAspNetCoreModule));
+            ImportModules(typeof(SpriteAspNetCoreModule),typeof(SpriteDataModule));
         }
     }
 }

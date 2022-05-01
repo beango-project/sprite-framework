@@ -55,7 +55,7 @@ namespace Sprite.DependencyInjection
 
             if (find)
             {
-                value = (T)value2;
+                value = (T)value2!;
             }
 
             value = default;

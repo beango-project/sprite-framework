@@ -7,7 +7,6 @@ namespace Sprite.Data.Entities.Auditing
         where TCreator : IEntity<TKey>
         where TKey : IEquatable<TKey>
     {
-        TKey CreatorId { get; }
         
         TCreator Creator { get; }
     }

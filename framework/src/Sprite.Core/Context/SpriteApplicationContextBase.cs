@@ -85,21 +85,6 @@ namespace Sprite.Context
         {
             using (var scope = ServiceProvider.CreateScope())
             {
-                // var logger = scope.ServiceProvider.GetService<ILogger<SpriteApplicationContextBase>>();
-                // if (logger == null)
-                // {
-                //     return;
-                // }
-                //
-                // var initLogger =  scope.ServiceProvider.GetRequiredService<IInitLoggerFactory>().Create<SpriteApplicationContextBase>();
-                //
-                // foreach (var entry in initLogger.Entries)
-                // {
-                //     logger.LogDebug(entry.Message);
-                // }
-
-                // initLogger.Entries.Clear();
-
                 scope.ServiceProvider.GetRequiredService<IModuleManager>().InitializeModules(new OnApplicationContext(scope.ServiceProvider));
             }
         }
