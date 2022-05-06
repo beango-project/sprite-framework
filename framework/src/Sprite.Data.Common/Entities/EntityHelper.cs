@@ -61,7 +61,7 @@ namespace Sprite.Data.Entities
             var lambdaParam = Expression.Parameter(typeof(TEntity));
             var lambdaBody = Expression.Equal(
                 Expression.PropertyOrField(lambdaParam, "Id"),
-                Expression.Constant(id, typeof(TKey))
+                Expression.ConstantOf(id)
             );
 
             return Expression.Lambda<Func<TEntity, bool>>(lambdaBody, lambdaParam).ToLambdaExpression();

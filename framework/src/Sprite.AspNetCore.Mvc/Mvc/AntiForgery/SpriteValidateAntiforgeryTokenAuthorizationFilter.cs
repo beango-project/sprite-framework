@@ -39,7 +39,7 @@ namespace Sprite.AspNetCore.Mvc.AntiForgery
             }
 
 
-            if (ShouldValidate(context))
+            if (await ShouldValidate(context))
             {
                 try
                 {
@@ -53,10 +53,10 @@ namespace Sprite.AspNetCore.Mvc.AntiForgery
             }
         }
 
-        protected virtual bool ShouldValidate(AuthorizationFilterContext context)
+        protected virtual async Task<bool> ShouldValidate(AuthorizationFilterContext context)
         {
             var authCookieName = _antiForgeryCookieProvider.GetAuthCookieName();
-            var authorizeDataAuthenticationSchemes = _authentication.GetDefaultAuthenticateSchemeAsync().Result.Name;
+            var authorizeDataAuthenticationSchemes = (await _authentication.GetDefaultAuthenticateSchemeAsync())?.Name;
             var dataAuthenticationSchemes = "AspNetCore."+authorizeDataAuthenticationSchemes;
             //Always perform antiforgery validation when request contains authentication cookie
             if (authCookieName != null && context.HttpContext.Request.Cookies.ContainsKey(dataAuthenticationSchemes))

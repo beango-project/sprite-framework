@@ -51,7 +51,7 @@ namespace System
                 throw new ArgumentException("lenght argument cannot be bigger than given string length!");
             }
 
-            return str.Substring(0, lenght);
+            return str.AsSpan().Slice(0, lenght).ToString();
         }
 
         public static string Right(this string str, int lenght)
@@ -62,8 +62,8 @@ namespace System
             {
                 throw new ArgumentException("lenght argument can not be bigger than given string's length!");
             }
-
-            return str.Substring(str.Length - lenght, lenght);
+            
+            return str.AsSpan().Slice(str.Length - lenght, lenght).ToString();
         }
 
 
@@ -143,7 +143,7 @@ namespace System
                 return useCurrentCulture ? str.ToLower() : str.ToLowerInvariant();
             }
 
-            return (useCurrentCulture ? char.ToLower(str[0]) : char.ToLowerInvariant(str[0])) + str.Substring(1);
+            return (useCurrentCulture ? char.ToLower(str[0]) : char.ToLowerInvariant(str[0])) + str.AsSpan()[1..].ToString();
         }
 
 
@@ -203,7 +203,8 @@ namespace System
                 return str;
             }
 
-            if (str[0] >= 65 && str[0] <= 90)
+            var span = str.AsSpan();
+            if (span[0]>=65&&str[0]<=90)
             {
                 return GetPascalCaseFirstWord(str);
             }

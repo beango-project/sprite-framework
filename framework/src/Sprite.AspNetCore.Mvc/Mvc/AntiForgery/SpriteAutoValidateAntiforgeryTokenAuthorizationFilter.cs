@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -23,11 +24,10 @@ namespace Sprite.AspNetCore.Mvc.AntiForgery
             antiforgery,
             antiForgeryCookieProvider, logger, authentication)
         {
-            
             _antiForgeryOptions = antiForgeryOptions.Value;
         }
 
-        protected override bool ShouldValidate(AuthorizationFilterContext context)
+        protected override async Task<bool> ShouldValidate(AuthorizationFilterContext context)
         {
             if (!_antiForgeryOptions.AutoValidate)
             {
@@ -53,7 +53,7 @@ namespace Sprite.AspNetCore.Mvc.AntiForgery
                 return false;
             }
 
-            return base.ShouldValidate(context);
+            return await base.ShouldValidate(context);
         }
     }
 }

@@ -93,7 +93,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             }
             else
             {
-                query = DbSet.AsQueryable();
+                query = DbSet;
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -325,7 +325,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
                     query = query.IncludeOptimized(includeProperty);
                 }
             }
-
+            
             var entity = query.FirstOrDefault(EntityHelper.BuildEntityEqualityExpressionFor<TEntity, TKey>(id));
             if (entity == null)
             {
