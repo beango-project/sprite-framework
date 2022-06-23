@@ -12,9 +12,14 @@ namespace Sprite.Data.Tests
 {
     class TestModuleConfig : ModuleConfig
     {
+        public override Type[] ImportModules()
+        {
+            return new[] { typeof(SpriteDataModule) };
+        }
+
+
         public override void Configure()
         {
-            ImportModules(typeof(SpriteDataModule));
         }
     }
 
@@ -28,7 +33,7 @@ namespace Sprite.Data.Tests
             services.Configure<DbConnectionOptions>(options => options.ConnectionStrings.Default = ConnectionStrings);
             services.Replace(ServiceDescriptor.Singleton<IConfiguration>(_ =>
                 new ConfigurationBuilder().Build()
-                ));
+            ));
             var connection = CreateConnectionAndDB();
             services.AddTransient<AdoSqlite>(_ => new AdoSqlite(connection));
             services.AddTransient<Ado<SqliteConnection>, AdoSqlite>(sp => sp.GetRequiredService<AdoSqlite>());

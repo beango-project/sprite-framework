@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Sprite.Modular;
 
 namespace Sprite.ObjectMapping.Mapster.Tests
 {
     class MapsterTestConfig : ModuleConfig
     {
-        public override void Configure()
+        public override Type[] ImportModules()
         {
-            ImportModules(typeof(SpriteMapsterModule));
+            return new[] { typeof(SpriteMapsterModule) };
         }
     }
 
@@ -16,10 +17,7 @@ namespace Sprite.ObjectMapping.Mapster.Tests
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<MapsterOptions>(options =>
-            {
-                options.AddMaps<MapsterTestModule>();
-            });
+            services.Configure<MapsterOptions>(options => { options.AddMaps<MapsterTestModule>(); });
         }
     }
 }

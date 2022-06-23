@@ -17,11 +17,6 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
 
         protected override IEnumerable<Type> GetEntityTypes(Type dbContextType)
         {
-            // return dbContextType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            //     .Where(x => ReflectionHelper.IsAssignableToGenericType(x.GetType().GetTypeInfo(), typeof(DbSet<>))
-            //                 && typeof(IEntity).IsAssignableFrom(x.PropertyType.GenericTypeArguments[0]))
-            //     .Select(x => x.PropertyType.GenericTypeArguments[0]);
-
             var types = from property in dbContextType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 where
                     ReflectionHelper.IsAssignableToGenericType(property.PropertyType, typeof(DbSet<>)) &&

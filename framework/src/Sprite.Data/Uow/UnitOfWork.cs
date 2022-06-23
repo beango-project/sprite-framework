@@ -246,7 +246,7 @@ namespace Sprite.Data.Uow
             }
 
             _isRolledback = true;
-            
+
             foreach (var entry in _vendorMap.Enumerate())
             {
                 if (entry.Value is ISupportTransaction transaction)
@@ -270,7 +270,7 @@ namespace Sprite.Data.Uow
             }
 
             _isRolledback = true;
-            
+
             foreach (var entry in _vendorMap.Enumerate())
             {
                 try
@@ -464,19 +464,28 @@ namespace Sprite.Data.Uow
         /// </summary>
         protected virtual void Unsubscribe()
         {
-            foreach (var e in OnCompleted.GetInvocationList())
+            if (OnCompleted != null)
             {
-                OnCompleted -= (EventHandler)e;
+                foreach (var e in OnCompleted.GetInvocationList())
+                {
+                    OnCompleted -= (EventHandler)e;
+                }
             }
 
-            foreach (var e in OnFailed.GetInvocationList())
+            if (OnFailed != null)
             {
-                OnFailed -= (EventHandler)e;
+                foreach (var e in OnFailed.GetInvocationList())
+                {
+                    OnFailed -= (EventHandler)e;
+                }
             }
 
-            foreach (var e in OnDisposed.GetInvocationList())
+            if (OnDisposed != null)
             {
-                OnDisposed -= (EventHandler)e;
+                foreach (var e in OnDisposed.GetInvocationList())
+                {
+                    OnDisposed -= (EventHandler)e;
+                }
             }
         }
     }

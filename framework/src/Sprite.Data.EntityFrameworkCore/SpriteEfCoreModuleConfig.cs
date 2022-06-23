@@ -1,12 +1,14 @@
-﻿using Sprite.Modular;
+﻿using System;
+using Sprite.Modular;
 
 namespace Sprite.Data.EntityFrameworkCore
 {
     public class SpriteEfCoreModuleConfig : ModuleConfig
     {
-        public override void Configure()
+        public override Type[] ImportModules()
         {
-            ImportModules(typeof(SpriteDataModule));
+            return new[] { typeof(SpriteDataModule) };
         }
     }
+    
 }

@@ -24,7 +24,7 @@ namespace Sprite.Modular
             var moduleConfig = FindModuleConfig(moduleImmediateType);
             if (moduleConfig != null)
             {
-                foreach (var depended in moduleConfig.DependedModules)
+                foreach (var depended in moduleConfig.ImportModules())
                 {
                     dependencies.AddIfNotContains(depended);
                 }
@@ -41,7 +41,7 @@ namespace Sprite.Modular
             if (moduleConfig != null)
             {
                 moduleConfig.Configure(); //调用导入模块方法
-                foreach (var depended in moduleConfig.DependedModules)
+                foreach (var depended in moduleConfig.ImportModules())
                 {
                     dependencies.AddIfNotContains(depended);
                 }

@@ -127,7 +127,7 @@ namespace Sprite.Data.Tests.Uow
       
 
 
-            using (var uow = _unitOfWorkManager.Begin())
+            using (var uow = _unitOfWorkManager.Begin(txOpts))
             {
                 _unitOfWorkManager.CurrentUow.ShouldNotBeNull();
                 _unitOfWorkManager.CurrentUow.ShouldBe(uow);
@@ -140,7 +140,18 @@ namespace Sprite.Data.Tests.Uow
                 vendor.CurrentTransaction.ShouldBe(dbTx);
                 uow.HasTransaction.ShouldBeTrue();
             }
+            using (var uow = _unitOfWorkManager.Begin(txOpts))
+            {
+                _unitOfWorkManager.CurrentUow.ShouldNotBeNull();
+                _unitOfWorkManager.CurrentUow.ShouldBe(uow);
+                uow.HasTransaction.ShouldBeFalse();
+                vendor = ServiceProvider.GetRequiredService<AdoSqlite>();
+                AddVendorInUow(_unitOfWorkManager.CurrentUow, "Ado_SQLite", vendor);
 
+                vendor.CurrentTransaction.ShouldBeNull();
+                
+                uow.HasTransaction.ShouldBeFalse();
+            }
             _unitOfWorkManager.CurrentUow.ShouldBeNull();
         }
 

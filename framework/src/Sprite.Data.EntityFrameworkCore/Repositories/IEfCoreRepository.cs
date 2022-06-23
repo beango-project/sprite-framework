@@ -14,8 +14,6 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
         DbSet<TEntity> DbSet { get; }
 
         Task<DbContext> GetDbContextAsync();
-        //
-        // Task<DbSet<TEntity>> GetDbSetAsync();
     }
 
     public interface IEfCoreRepository<TEntity, TKey> : IEfCoreRepository<TEntity>, IRepository<TEntity, TKey>

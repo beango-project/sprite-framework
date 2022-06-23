@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Sprite.DependencyInjection;
@@ -15,8 +16,8 @@ namespace Sprite.Core.Tests.Modular
         {
             var configure = new RootStartupModuleConfig();
             configure.Configure();
-            configure.DependedModules.Length.ShouldBe(1);
-            configure.DependedModules[0].ShouldBe(typeof(EmptyModule));
+            configure.ImportModules().Length.ShouldBe(1);
+            configure.ImportModules()[0].ShouldBe(typeof(EmptyModule));
         }
 
         [Fact]
@@ -50,10 +51,14 @@ namespace Sprite.Core.Tests.Modular
 
     public class RootStartupModuleConfig : ModuleConfig
     {
+        public override Type[] ImportModules()
+        {
+            return new[] { typeof(EmptyModule) };
+        }
+
         public override void Configure()
         {
             SkipAutoScanRegister = true;
-            ImportModules(typeof(EmptyModule));
         }
     }
 

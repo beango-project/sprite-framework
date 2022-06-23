@@ -1,13 +1,14 @@
-﻿using Sprite.Modular;
+﻿using System;
+using Sprite.Modular;
 using Sprite.Web;
 
 namespace Sprite.AspNetCore
 {
     public class SpriteAspNetCoreConfig : ModuleConfig
     {
-        public override void Configure()
+        public override Type[] ImportModules()
         {
-            ImportModules(typeof(SpriteWebModule));
+            return new[] { typeof(SpriteWebModule) };
         }
     }
 }
