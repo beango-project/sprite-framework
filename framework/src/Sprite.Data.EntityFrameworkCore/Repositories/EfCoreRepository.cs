@@ -52,7 +52,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             {
                 foreach (var includeProperty in propertySelectors)
                 {
-                    query = query.IncludeOptimized(includeProperty);
+                    query = query.Include(includeProperty);
                 }
             }
 
@@ -84,11 +84,11 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
                 {
                     if (query == null)
                     {
-                        query = DbSet.IncludeOptimized(includeProperty);
+                        query = DbSet.Include(includeProperty);
                         continue;
                     }
 
-                    query = query.IncludeOptimized(includeProperty);
+                    query = query.Include(includeProperty);
                 }
             }
             else
@@ -109,7 +109,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             {
                 foreach (var includeProperty in propertySelectors)
                 {
-                    query = query.IncludeOptimized(includeProperty);
+                    query = query.Include(includeProperty);
                 }
             }
 
@@ -131,7 +131,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             {
                 foreach (var includeProperty in propertySelectors)
                 {
-                    query = query.IncludeOptimized(includeProperty);
+                    query = query.Include(includeProperty);
                 }
             }
 
@@ -247,7 +247,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             var queryable = DbSet.Where(predicate);
             DbSet.RemoveRange(queryable);
             var res = queryable.DeferredCount().FutureValue();
-            
+
             if (autoSave)
             {
                 var saveCount = await DbContext.SaveChangesAsync(cancellationToken);
@@ -260,8 +260,8 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
         public override async Task DeleteManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
             //TODO :修改改为追踪方式
-            await DbSet.BulkDeleteAsync(entities, cancellationToken);
-
+            // await DbSet.BulkDeleteAsync(entities, cancellationToken);
+            DbSet.RemoveRange(entities);
             if (autoSave)
             {
                 await DbContext.SaveChangesAsync(cancellationToken);
@@ -322,10 +322,10 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             {
                 foreach (var includeProperty in propertySelectors)
                 {
-                    query = query.IncludeOptimized(includeProperty);
+                    query = query.Include(includeProperty);
                 }
             }
-            
+
             var entity = query.FirstOrDefault(EntityHelper.BuildEntityEqualityExpressionFor<TEntity, TKey>(id));
             if (entity == null)
             {
@@ -353,7 +353,7 @@ namespace Sprite.Data.EntityFrameworkCore.Repositories
             {
                 foreach (var includeProperty in propertySelectors)
                 {
-                    query = query.IncludeOptimized(includeProperty);
+                    query = query.Include(includeProperty);
                 }
             }
 

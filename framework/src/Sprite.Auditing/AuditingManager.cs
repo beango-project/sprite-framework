@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Nito.AsyncEx;
 using Sprite.DependencyInjection.Attributes;
 
 namespace Sprite.Auditing
@@ -117,29 +118,30 @@ namespace Sprite.Auditing
 
         public void End()
         {
+            AsyncContext.Run(EndAsync);
+        }
+
+        public async Task EndAsync()
+        {
             if (Current == null)
             {
-                return;
+                await Task.CompletedTask;
             }
 
             var context = new AuditScopeContext(null, Current);
 
             foreach (var handler in Current.Options.Handlers.OrderBy(handler => handler.Order))
             {
-                if (handler is IAuditingEndHandler startHandler)
+                switch (handler)
                 {
-                    startHandler.Invoke(context);
-                }
-                else if (handler is IAuditingHandlerAsync startHandlerAsync)
-                {
-                    startHandlerAsync.InvokeAsync(context).ConfigureAwait(false);
+                    case IAuditingEndHandler startHandler:
+                        startHandler.Invoke(context);
+                        break;
+                    case IAuditingHandlerAsync startHandlerAsync:
+                        await startHandlerAsync.InvokeAsync(context);
+                        break;
                 }
             }
-        }
-
-        public Task EndAsync()
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
